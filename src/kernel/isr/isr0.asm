@@ -20,15 +20,6 @@ isr0:
     pop bx
     pop si
 
-    mov ax, 1
-    mov bx, 2
-    mov cx, 3
-    mov dx, 4
-    mov bp, 5
-    mov di, 1
-    mov si, 1
-    call print_register_dump
-
     mov si, .ERROR_MESSAGE_FOOTER_STR
     mov bl, 0x04
     call puts

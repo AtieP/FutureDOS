@@ -35,10 +35,8 @@ kmain:
     call init_ivt
     PRINT_DONE
 
-    int 0
-
-    cli
-    hlt
+    PRINT_TRACE LOADED_SUCCESSFULLY_STR
+    
     jmp $
 
 
@@ -75,5 +73,6 @@ DONE_STR: db " DONE",0x0A,0x0D,0x00
 FAIL_STR: db " FAIL",0x0A,0x0D,0x00
 
 REMAPING_INTERRUPTS_STR: db "Remapping interrupts...",0x00
+LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x00
 
 times 1024 - ($ - $$) db 0
