@@ -1,8 +1,8 @@
 %ifndef __CGA_ASM
 %define __CGA_ASM
 
-_CGA_CURSOR_X: dw 0x0000
-_CGA_CURSOR_Y: dw 0x0000
+__CGA_CURSOR_X: dw 0x0000
+__CGA_CURSOR_Y: dw 0x0000
 
 ; Initializes the driver.
 init_cga:
@@ -32,8 +32,8 @@ cga_putc:
     mov es, ax
 
     ; Get where to place the char
-    mov bx, [_CGA_CURSOR_X]
-    mov ax, [_CGA_CURSOR_Y]
+    mov bx, [__CGA_CURSOR_X]
+    mov ax, [__CGA_CURSOR_Y]
     mov dl, 80
     mul dl
     add ax, bx
@@ -44,8 +44,8 @@ cga_putc:
 
     mov [es:di], word ax
 
-    mov bx, [_CGA_CURSOR_X]
-    mov cx, [_CGA_CURSOR_Y]
+    mov bx, [__CGA_CURSOR_X]
+    mov cx, [__CGA_CURSOR_Y]
     inc bx
     cmp bx, 80
     je .new_line
@@ -120,8 +120,8 @@ cga_move_cursor:
     push bx
     push dx
 
-    mov [_CGA_CURSOR_X], bx
-    mov [_CGA_CURSOR_Y], cx
+    mov [__CGA_CURSOR_X], bx
+    mov [__CGA_CURSOR_Y], cx
 
     mov ax, cx
     mov dl, 80
@@ -155,8 +155,8 @@ cga_move_cursor:
 ; IN: Nothing
 ; OUT: X position in BX, Y position in CX
 cga_get_cursor:
-    mov bx, [_CGA_CURSOR_X]
-    mov cx, [_CGA_CURSOR_Y]
+    mov bx, [__CGA_CURSOR_X]
+    mov cx, [__CGA_CURSOR_Y]
     ret
 
 ; Scrolls.
@@ -188,7 +188,7 @@ cga_scroll:
     loop .move_lines
 
     xor bx, bx
-    mov cx, [_CGA_CURSOR_Y]
+    mov cx, [__CGA_CURSOR_Y]
     dec cx
     call cga_move_cursor
 
