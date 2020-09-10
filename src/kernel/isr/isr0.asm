@@ -10,15 +10,13 @@ isr0:
     mov bl, 0x04
     call puts
 
-    pop ax
-    pop cx
-    push cx
-    push ax
     mov si, .ERROR_MESSAGE_BODY_STR
     call puts
 
     pop bx
     pop si
+
+    call print_register_dump
 
     mov si, .ERROR_MESSAGE_FOOTER_STR
     mov bl, 0x04
