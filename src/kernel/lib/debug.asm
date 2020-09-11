@@ -1,5 +1,9 @@
-%ifndef __DEBUG_ASM
-%define __DEBUG_ASM
+bits 16
+cpu 8086
+
+; putc: src/kernel/lib/screen.asm
+; puts: src/kernel/lib/screen.asm
+; itohex: src/kernel/lib/string.asm
 
 ; Prints a register dump. To be able to print CS and IP, push them
 ; (first CS and then IP).
@@ -27,6 +31,7 @@ print_register_dump:
     push si
 
     push si
+    push sp
     push dx
     push bx
 
@@ -112,9 +117,13 @@ print_register_dump:
     ; DUMP SP
 
     ; Convert SP value to ASCII
-    mov dx, sp
-    ; Add 4 because SI and the return address is on the stack
-    add dx, 4
+    pop dx
+    ; Add 16 because:
+    ; - SI on the stack
+    ; - Altered registers on the stack
+    ; - Returns address on the stack
+    ; - IP and CS on the stack
+    add dx, 16
     call itohex
 
     ; Print "SP: "
@@ -246,5 +255,3 @@ print_register_dump:
 .REGISTER_IP_STR: db "IP: ",0x00
 
 .HEX_BUFFER: db "0x0000",0x00
-
-%endif

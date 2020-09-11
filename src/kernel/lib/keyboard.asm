@@ -1,4 +1,2 @@
-%ifndef __KEYBOARD_ASM
-%define __KEYBOARD_ASM
-
-%endif
+bits 16
+cpu 8086

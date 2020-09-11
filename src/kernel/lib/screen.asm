@@ -1,5 +1,10 @@
-%ifndef __SCREEN_ASM
-%define __SCREEN_ASM
+bits 16
+cpu 8086
+
+; cga_putc: src/kernel/drivers/cga.asm
+; cga_scroll: src/kernel/drivers/cga.asm
+; cga_move_cursor: src/kernel/drivers/cga.asm
+; cga_get_cursor: src/kernel/drivers/cga.asm
 
 ; Prints a char into the screen. Unlike cga_putc, escaping is allowed.
 ; IN: AL = Char, BL = Color
@@ -87,5 +92,3 @@ puts:
     pop si
     pop ax
     ret
-
-%endif

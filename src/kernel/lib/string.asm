@@ -1,5 +1,5 @@
-%ifndef __STRING_ASM
-%define __STRING_ASM
+bits 16
+cpu 8086
 
 ; Compares a string.
 ; IN: SI = First string to compare, DI = Second string to compare
@@ -76,5 +76,3 @@ itohex:
     pop bx
     pop ax
     ret
-
-%endif
