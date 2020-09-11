@@ -7,6 +7,8 @@ cpu 8086
 
 ; Prints a register dump. To be able to print CS and IP, push them
 ; (first CS and then IP).
+; NOTE: CS and IP are NOT POPPED. You NEED TO POP THEM FROM THE STACK YOURSELF
+; AFTER THIS FUNCTION.
 ; Please note that there is no support for DS, ES, and SS.
 
 %define _REGISTER_NAME_COLOR 0x0F
@@ -180,8 +182,7 @@ print_register_dump:
     ; DUMP SI
 
     ; Convert SI value to ASCII
-    pop si
-    mov dx, si
+    pop dx
     mov si, .HEX_BUFFER
     call itohex
 
