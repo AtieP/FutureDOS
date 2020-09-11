@@ -1,4 +1,2 @@
-%ifndef __PIC_ASM
-%define __PIC_ASM
-
-%endif
+bits 16
+cpu 8086

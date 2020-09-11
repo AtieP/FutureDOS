@@ -1,3 +1,6 @@
+bits 16
+cpu 8086
+
 __KEYBOARD_IRQ_CALLED: db 0
 __KEYBOARD_LAST_KEY: db 0
 

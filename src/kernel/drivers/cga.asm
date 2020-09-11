@@ -1,5 +1,5 @@
-%ifndef __CGA_ASM
-%define __CGA_ASM
+bits 16
+cpu 8086
 
 __CGA_CURSOR_X: dw 0x0000
 __CGA_CURSOR_Y: dw 0x0000
@@ -199,5 +199,3 @@ cga_scroll:
     pop bx
     pop ax
     ret
-
-%endif
