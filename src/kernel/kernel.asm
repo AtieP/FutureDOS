@@ -40,11 +40,7 @@ kmain:
 
     PRINT_TRACE LOADED_SUCCESSFULLY_STR
 
-    PRINT_TRACE PROMPT
-
-.a:
-    call keyboard_getkey
-    jmp .a
+    jmp $
 
 
 init_ivt:
@@ -62,6 +58,9 @@ init_ivt:
     mov [es:di+0x00], word isr0
     mov [es:di+0x02], word cs
 
+    mov [es:di+0x18], word isr6
+    mov [es:di+0x1A], word cs
+
     mov [es:di+0x24], word isr9
     mov [es:di+0x26], word cs
 
@@ -77,10 +76,12 @@ init_ivt:
 %include "kernel/drivers/keyboard.asm"
 
 %include "kernel/lib/debug.asm"
+%include "kernel/lib/keyboard.asm"
 %include "kernel/lib/screen.asm"
 %include "kernel/lib/string.asm"
 
 %include "kernel/isr/isr0.asm"
+%include "kernel/isr/isr6.asm"
 %include "kernel/isr/isr9.asm"
 
 DONE_STR: db " DONE",0x0A,0x0D,0x00
@@ -90,5 +91,4 @@ INITIALIZING_DRIVERS_STR: db "Initializing drivers...",0x00
 REMAPING_INTERRUPTS_STR: db "Remapping interrupts...",0x00
 LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x00
 
-PROMPT: db 0x0a,0x0d,0x0a,0x0d,"# ",0x00
 times 1536 - ($ - $$) db 0
