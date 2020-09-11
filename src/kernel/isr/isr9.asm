@@ -1,6 +1,9 @@
 bits 16
 cpu 8086
 
+; __KEYBOARD_IRQ_CALLED: src/kernel/drivers/keyboard.asm
+; __KEYBOARD_LAST_KEY: src/kernel/drivers/keyboard.asm
+
 ; Handler for keyboard key press/release IRQ
 isr9:
     push ax

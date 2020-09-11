@@ -1,6 +1,9 @@
 bits 16
 cpu 8086
 
+; puts: src/kernel/lib/screen.asm
+; print_register_dump: src/kernel/lib/debug.asm
+
 ; Handler for division by zero exception
 isr0:
     push si
