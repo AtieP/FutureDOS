@@ -42,6 +42,7 @@ kmain:
 
     PRINT_TRACE LOADED_SUCCESSFULLY_STR
 
+
 hang:
     hlt
     jmp hang
@@ -61,6 +62,9 @@ init_ivt:
 
     mov [es:di+0x00], word isr0
     mov [es:di+0x02], word cs
+
+    mov [es:di+0x0C], word isr3
+    mov [es:di+0x0E], word cs
 
     mov [es:di+0x18], word isr6
     mov [es:di+0x1A], word cs
@@ -85,6 +89,7 @@ init_ivt:
 %include "kernel/lib/string.asm"
 
 %include "kernel/isr/isr0.asm"
+%include "kernel/isr/isr3.asm"
 %include "kernel/isr/isr6.asm"
 %include "kernel/isr/isr9.asm"
 

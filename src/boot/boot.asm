@@ -2,7 +2,7 @@ bits 16
 cpu 8086
 org 0x7c00
 
-%define _SECTORS_TO_READ 3
+%define _SECTORS_TO_READ 4
 %define _KERNEL_SEGMENT 0x0800
 %define _KERNEL_OFFSET 0x0000
 
