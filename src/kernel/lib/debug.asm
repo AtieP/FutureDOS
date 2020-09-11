@@ -121,7 +121,7 @@ print_register_dump:
     ; Add 16 because:
     ; - SI on the stack
     ; - Altered registers on the stack
-    ; - Returns address on the stack
+    ; - Return address on the stack
     ; - IP and CS on the stack
     add dx, 16
     call itohex
