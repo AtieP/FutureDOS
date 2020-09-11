@@ -40,7 +40,11 @@ kmain:
 
     PRINT_TRACE LOADED_SUCCESSFULLY_STR
 
-    jmp $
+    PRINT_TRACE LOADED_SUCCESSFULLY_STR
+
+hang:
+    hlt
+    jmp hang
 
 
 init_ivt:
@@ -91,4 +95,4 @@ INITIALIZING_DRIVERS_STR: db "Initializing drivers...",0x00
 REMAPING_INTERRUPTS_STR: db "Remapping interrupts...",0x00
 LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x00
 
-times 1536 - ($ - $$) db 0
+times 2048 - ($ - $$) db 0
