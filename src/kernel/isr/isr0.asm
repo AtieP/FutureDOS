@@ -1,7 +1,7 @@
-%include "kernel/lib/debug.asm"
-%include "kernel/lib/screen.asm"
+bits 16
+cpu 8086
 
-
+; Handler for division by zero exception
 isr0:
     push si
     push bx
