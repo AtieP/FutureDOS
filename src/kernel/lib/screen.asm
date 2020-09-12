@@ -80,6 +80,7 @@ putc:
 puts:
     push ax
     push si
+    cld
 
 .print_each_char:
     lodsb
