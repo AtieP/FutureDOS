@@ -24,6 +24,9 @@ putc:
     cmp al, 0x0D
     je .carriage_return
 
+    cmp al, 0xFF
+    je .end
+
     call cga_putc
     jmp .end
 
