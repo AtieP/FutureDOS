@@ -1,0 +1,4 @@
+script:
+    - "sudo apt-get install nasm"
+    - "chmod u+x build.sh"
+    - "./build.sh"
