@@ -8,4 +8,3 @@ cat bin/kernel >> bin/boot
 mkdir -p disk
 rm disk/*
 mv bin/boot disk/floppy.flp
-qemu-system-x86_64 disk/floppy.flp -monitor stdio
