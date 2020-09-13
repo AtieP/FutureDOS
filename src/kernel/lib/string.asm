@@ -3,25 +3,24 @@ cpu 8086
 
 ; Compares a string.
 ; IN: SI = First string to compare, DI = Second string to compare
-; OUT: Carry if equal
+; OUT: Carry clear if equal, else carry set
 strcmp:
     push ax
-    push si
-    push di
+    push bx
+    xor bx, bx
 
-
-.cmp_char:
-    lodsb
-    cmp al, [di]
-    jne .not_equal
+.check_equal:
+    mov al, [si + bx]
+    cmp al, [di + bx]
+    jne .mismatch
 
     test al, al
     jz .equal
 
-    inc di
-    jmp .cmp_char
+    inc bx
+    jmp .check_equal
 
-.not_equal:
+.mismatch:
     stc
     jmp .end
 
@@ -29,8 +28,7 @@ strcmp:
     clc
 
 .end:
-    pop di
-    pop si
+    pop bx
     pop ax
     ret
 
