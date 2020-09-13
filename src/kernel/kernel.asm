@@ -67,6 +67,9 @@ init_ivt:
     mov [es:di+0x18], word isr6
     mov [es:di+0x1A], word cs
 
+    mov [es:di+0x20], word isr8
+    mov [es:di+0x22], word cs
+
     mov [es:di+0x24], word isr9
     mov [es:di+0x26], word cs
 
@@ -89,6 +92,7 @@ init_ivt:
 %include "kernel/isr/isr0.asm"
 %include "kernel/isr/isr3.asm"
 %include "kernel/isr/isr6.asm"
+%include "kernel/isr/isr8.asm"
 %include "kernel/isr/isr9.asm"
 
 DONE_STR: db " DONE",0x0A,0x0D,0x00
