@@ -41,6 +41,7 @@ itohex:
     push bx
     push cx
     push dx
+    pushf
 
     xor cx, cx
 
@@ -69,6 +70,7 @@ itohex:
     jmp .nibble_to_char
 
 .end:
+    popf
     pop dx
     pop cx
     pop bx

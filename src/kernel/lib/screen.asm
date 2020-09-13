@@ -83,6 +83,7 @@ putc:
 puts:
     push ax
     push si
+    pushf
     cld
 
 .print_each_char:
@@ -93,6 +94,7 @@ puts:
     jmp .print_each_char
 
 .end:
+    popf
     pop si
     pop ax
     ret

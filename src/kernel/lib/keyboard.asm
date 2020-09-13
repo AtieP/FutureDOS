@@ -90,6 +90,7 @@ cpu 8086
 ; OUT: AH = Keycode, AL = ASCII representation of the keycode
 getchar:
     push si
+    pushf
     xor ax, ax
 
 .check_not_keyrelease:
@@ -109,6 +110,7 @@ getchar:
     mov ah, al
     lodsb
 
+    popf
     pop si
     ret
 
@@ -131,6 +133,7 @@ gets:
     push cx
     push dx
     push di
+    pushf
 
     cld
     xor dx, dx
@@ -164,6 +167,7 @@ gets:
     xor al, al
     stosb
 
+    popf
     pop di
     pop dx
     pop cx
@@ -181,6 +185,7 @@ getsp:
     push cx
     push dx
     push di
+    pushf
 
     cld
     xor dx, dx
@@ -223,6 +228,7 @@ getsp:
     mov al, 0x0D
     call putc
 
+    popf
     pop di
     pop dx
     pop cx
