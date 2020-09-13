@@ -8,6 +8,7 @@ __KEYBOARD_LAST_KEY: db 0
 ; IN: Nothing
 ; OUT: AH = Keycode
 keyboard_raw_getkey:
+    pushf
     mov [__KEYBOARD_IRQ_CALLED], byte 0
 
 .check_if_irq_was_triggered:
@@ -20,4 +21,5 @@ keyboard_raw_getkey:
     mov ah, [__KEYBOARD_LAST_KEY]
 
 .end:
+    popf
     ret

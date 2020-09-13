@@ -24,6 +24,7 @@ cga_putc:
     push dx
     push di
     push es
+    pushf
 
     mov ah, bl
 
@@ -66,6 +67,7 @@ cga_putc:
     call cga_scroll
 
 .end:
+    popf
     pop es
     pop di
     pop dx
