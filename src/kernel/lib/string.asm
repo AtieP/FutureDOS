@@ -32,6 +32,44 @@ strcmp:
     pop ax
     ret
 
+; Checks if a string starts with the specified prefix.
+; IN: SI = Original string to compare, DI = Prefix, CX: Length of the prefix
+; OUT: Carry clear if starts with, else set
+strstartswith:
+    push ax
+    push bx
+    pushf
+
+    xor bx, bx
+
+.check_chars:
+    test cx, cx
+    jz .match
+    
+    mov al, [si + bx]
+    cmp al, [di + bx]
+    jne .mismatch
+
+    inc bx
+    dec cx
+    jmp .check_chars
+
+.mismatch:
+    popf
+    stc
+    jmp .end
+
+.match:
+    popf
+    clc
+
+.end:
+    pop bx
+    pop ax
+    ret
+
+
+.check_str:
 ; Converts a 16-bit integer to a string. In hexadecimal.
 ; IN: DX = 16-bit integer, SI = The place where the string will be put
 ; (note: 6 bytes required)
