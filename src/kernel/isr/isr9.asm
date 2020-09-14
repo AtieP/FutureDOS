@@ -7,7 +7,6 @@ cpu 8086
 ; Handler for keyboard key press/release IRQ
 isr9:
     push ax
-    push bx
 
     mov [__KEYBOARD_IRQ_CALLED], byte 1
 
@@ -17,7 +16,6 @@ isr9:
     mov al, 0x20
     out 0x20, al
 
-    pop bx
     pop ax
     sti
     iret
