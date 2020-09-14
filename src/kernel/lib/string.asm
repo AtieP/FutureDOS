@@ -38,6 +38,7 @@ strcmp:
 strstartswith:
     push ax
     push bx
+    push cx
     pushf
 
     xor bx, bx
@@ -45,7 +46,7 @@ strstartswith:
 .check_chars:
     test cx, cx
     jz .match
-    
+
     mov al, [si + bx]
     cmp al, [di + bx]
     jne .mismatch
@@ -64,6 +65,7 @@ strstartswith:
     clc
 
 .end:
+    pop cx
     pop bx
     pop ax
     ret
