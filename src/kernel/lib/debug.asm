@@ -259,5 +259,5 @@ print_register_dump:
 
 %undef _REGISTER_NAME_COLOR
 %undef _REGISTER_VALUE_COLOR
-%undef _PRINT_SPACE
-%undef _PRINT_NEW_LINE
+%unmacro _PRINT_SPACE 0
+%unmacro _PRINT_NEW_LINE 0
