@@ -256,3 +256,8 @@ print_register_dump:
 .REGISTER_IP_STR: db "IP: ",0x00
 
 .HEX_BUFFER: db "0x0000",0x00
+
+%undef _REGISTER_NAME_COLOR
+%undef _REGISTER_VALUE_COLOR
+%undef _PRINT_SPACE
+%undef _PRINT_NEW_LINE
