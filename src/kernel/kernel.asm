@@ -48,35 +48,31 @@ hang:
 
 init_ivt:
     push ax
-    push di
-    push es
+    push ds
 
     xor ax, ax
-    mov es, ax
-
-    xor di, di
+    mov ds, ax
 
     cli
 
-    mov [es:di+0x00], word isr0
-    mov [es:di+0x02], word cs
+    mov [0x00], word isr0
+    mov [0x02], word cs
 
-    mov [es:di+0x0C], word isr3
-    mov [es:di+0x0E], word cs
+    mov [0x0C], word isr3
+    mov [0x0E], word cs
 
-    mov [es:di+0x18], word isr6
-    mov [es:di+0x1A], word cs
+    mov [0x18], word isr6
+    mov [0x1A], word cs
 
-    mov [es:di+0x20], word isr8
-    mov [es:di+0x22], word cs
+    mov [0x20], word isr8
+    mov [0x22], word cs
 
-    mov [es:di+0x24], word isr9
-    mov [es:di+0x26], word cs
+    mov [0x24], word isr9
+    mov [0x26], word cs
 
     sti
 
-    pop es
-    pop di
+    pop ds
     pop ax
     ret
 
