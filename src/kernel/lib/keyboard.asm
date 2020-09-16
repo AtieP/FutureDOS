@@ -24,9 +24,37 @@ getchar:
     pop ax
     je .check_not_keyrelease
 
-.keypress:
+    cmp [__KEYBOARD_FLAGS.left_shift], byte 1
+    je .shift
+
+    cmp [__KEYBOARD_FLAGS.right_shift], byte 1
+    je .shift
+
+    cmp [__KEYBOARD_FLAGS.capslock], byte 1
+    je .capslock
+
+    jmp .normal
+
+.shift:
+    cmp [__KEYBOARD_FLAGS.capslock], byte 1
+    je .shift_and_capslock
+
+    mov si, en_us.shift
+    jmp .convert_to_ascii_and_return
+
+.shift_and_capslock:
+    mov si, en_us.shift_and_capslock
+    jmp .convert_to_ascii_and_return
+
+.capslock:
+    mov si, en_us.capslock
+    jmp .convert_to_ascii_and_return
+
+.normal:
+    mov si, en_us.normal
+
+.convert_to_ascii_and_return:
     ; Convert it to ASCII
-    mov si, en_us.lower
     mov al, ah
     xor ah, ah
     add si, ax
@@ -159,67 +187,358 @@ getsp:
     ret
 
 en_us:
-.lower:
+.normal:
 
     ; Pressed
 		db 0xFF
     db 0xFF ; Escape
-    db "1"  ; 1
-    db "2"  ; 2
-    db "3"  ; 3
-    db "4"  ; 4
-    db "5"  ; 5
-    db "6"  ; 6
-    db "7"  ; 7
-    db "8"  ; 8
-    db "9"  ; 9
-    db "0"  ; 0
-    db "-"  ; -
-    db "="  ; =
+    db "1"
+    db "2"
+    db "3"
+    db "4"
+    db "5"
+    db "6"
+    db "7"
+    db "8"
+    db "9"
+    db "0"
+    db "-"
+    db "="
     db 0x08 ; Backspace
     db 0xFF ; Tab
-    db "q"  ; q
-    db "w"  ; w
-    db "e"  ; e
-    db "r"  ; r
-    db "t"  ; t
-    db "y"  ; y
-    db "u"  ; u
-    db "i"  ; i
-    db "o"  ; o
-    db "p"  ; p
-    db "["  ; [
-    db "]"  ; ]
+    db "q"
+    db "w"
+    db "e"
+    db "r"
+    db "t"
+    db "y"
+    db "u"
+    db "i"
+    db "o"
+    db "p"
+    db "["
+    db "]"
     db 0x0A ; Enter
     db 0xFF ; Left control
-    db "a"  ; a
-    db "s"  ; s
-    db "d"  ; d
-    db "f"  ; f
-    db "g"  ; g
-    db "h"  ; h
-    db "j"  ; j
-    db "k"  ; k
-    db "l"  ; l
-    db ";"  ; ;
-    db "'"  ; '
-    db "`"  ; `
+    db "a"
+    db "s"
+    db "d"
+    db "f"
+    db "g"
+    db "h"
+    db "j"
+    db "k"
+    db "l"
+    db ";"
+    db "'"
+    db "`"
     db 0xFF ; Left shift
     db 0x5C ; Backward slash
-    db "z"  ; z
-    db "x"  ; x
-    db "c"  ; c
-    db "v"  ; v
-    db "b"  ; b
-    db "n"  ; n
-    db "m"  ; m
-    db ","  ; ,
-    db "."  ; .
-    db "/"  ; /
+    db "z"
+    db "x"
+    db "c"
+    db "v"
+    db "b"
+    db "n"
+    db "m"
+    db ","
+    db "."
+    db "/"
     db 0xFF ; Right shift
     db "*"  ; Keypad *
     db 0xFF ; Left alt
-    db " "  ; Space
+    db " "
+    db 0xFF ; Capslock
+    db 0xFF ; F1
+    db 0xFF ; F2
+    db 0xFF ; F3
+    db 0xFF ; F4
+    db 0xFF ; F5
+    db 0xFF ; F6
+    db 0xFF ; F7
+    db 0xFF ; F8
+    db 0xFF ; F9
+    db 0xFF ; F10
+    db 0xFF ; Number lock
+    db 0xFF ; Scroll lock
+    db "7"  ; Keypad 7
+    db "8"  ; Keypad 8
+    db "9"  ; Keypad 9
+    db "-"  ; Keypad -
+    db "4"  ; Keypad 4
+    db "5"  ; Keypad 5
+    db "6"  ; Keypad 6
+    db "+"  ; Keypad +
+    db "1"  ; Keypad 1
+    db "2"  ; Keypad 2
+    db "3"  ; Keypad 3
+    db "0"  ; Keypad 0
+    db "."  ; Keypad .
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; F11
+    db 0xFF ; F12
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+
+.capslock:
+
+    ; Pressed
+    db 0xFF
+    db 0xFF ; Escape
+    db "1"
+    db "2"
+    db "3"
+    db "4"
+    db "5"
+    db "6"
+    db "7"
+    db "8"
+    db "9"
+    db "0"
+    db "-"
+    db "="
+    db 0x08 ; Backspace
+    db 0xFF ; Tab
+    db "Q"
+    db "W"
+    db "E"
+    db "R"
+    db "T"
+    db "Y"
+    db "U"
+    db "I"
+    db "O"
+    db "P"
+    db "["
+    db "]"
+    db 0x0A ; Enter
+    db 0xFF ; Left control
+    db "A"
+    db "S"
+    db "D"
+    db "F"
+    db "G"
+    db "H"
+    db "J"
+    db "K"
+    db "L"
+    db ";"
+    db "'"
+    db "`"
+    db 0xFF ; Left shift
+    db 0x5C ; Backward slash
+    db "Z"
+    db "X"
+    db "C"
+    db "V"
+    db "B"
+    db "N"
+    db "M"
+    db ","
+    db "."
+    db "/"
+    db 0xFF ; Right shift
+    db "*"  ; Keypad *
+    db 0xFF ; Left alt
+    db " "
+    db 0xFF ; Capslock
+    db 0xFF ; F1
+    db 0xFF ; F2
+    db 0xFF ; F3
+    db 0xFF ; F4
+    db 0xFF ; F5
+    db 0xFF ; F6
+    db 0xFF ; F7
+    db 0xFF ; F8
+    db 0xFF ; F9
+    db 0xFF ; F10
+    db 0xFF ; Number lock
+    db 0xFF ; Scroll lock
+    db "7"  ; Keypad 7
+    db "8"  ; Keypad 8
+    db "9"  ; Keypad 9
+    db "-"  ; Keypad -
+    db "4"  ; Keypad 4
+    db "5"  ; Keypad 5
+    db "6"  ; Keypad 6
+    db "+"  ; Keypad +
+    db "1"  ; Keypad 1
+    db "2"  ; Keypad 2
+    db "3"  ; Keypad 3
+    db "0"  ; Keypad 0
+    db "."  ; Keypad .
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; F11
+    db 0xFF ; F12
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+
+.shift:
+
+    ; Pressed
+    db 0xFF
+    db 0xFF ; Escape
+    db "!"
+    db "@"
+    db "#"
+    db "$"
+    db "%"
+    db "^"
+    db "&"
+    db "*"
+    db "("
+    db ")"
+    db "_"
+    db "+"
+    db 0x08 ; Backspace
+    db 0xFF ; Tab
+    db "Q"
+    db "W"
+    db "E"
+    db "R"
+    db "T"
+    db "Y"
+    db "U"
+    db "I"
+    db "O"
+    db "P"
+    db "{"
+    db "}"
+    db 0x0A ; Enter
+    db 0xFF ; Left control
+    db "A"
+    db "S"
+    db "D"
+    db "F"
+    db "G"
+    db "H"
+    db "J"
+    db "K"
+    db "L"
+    db ":"
+    db '"'
+    db "~"
+    db 0xFF ; Left shift
+    db "|"
+    db "Z"
+    db "X"
+    db "C"
+    db "V"
+    db "B"
+    db "N"
+    db "M"
+    db "<"
+    db ">"
+    db "?"
+    db 0xFF ; Right shift
+    db "*"  ; Keypad *
+    db 0xFF ; Left alt
+    db " "
+    db 0xFF ; Capslock
+    db 0xFF ; F1
+    db 0xFF ; F2
+    db 0xFF ; F3
+    db 0xFF ; F4
+    db 0xFF ; F5
+    db 0xFF ; F6
+    db 0xFF ; F7
+    db 0xFF ; F8
+    db 0xFF ; F9
+    db 0xFF ; F10
+    db 0xFF ; Number lock
+    db 0xFF ; Scroll lock
+    db "7"  ; Keypad 7
+    db "8"  ; Keypad 8
+    db "9"  ; Keypad 9
+    db "-"  ; Keypad -
+    db "4"  ; Keypad 4
+    db "5"  ; Keypad 5
+    db "6"  ; Keypad 6
+    db "+"  ; Keypad +
+    db "1"  ; Keypad 1
+    db "2"  ; Keypad 2
+    db "3"  ; Keypad 3
+    db "0"  ; Keypad 0
+    db "."  ; Keypad .
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; F11
+    db 0xFF ; F12
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+    db 0xFF ; Unused
+
+.shift_and_capslock:
+
+    ; Pressed
+    db 0xFF
+    db 0xFF ; Escape
+    db "!"
+    db "@"
+    db "#"
+    db "$"
+    db "%"
+    db "^"
+    db "&"
+    db "*"
+    db "("
+    db ")"
+    db "_"
+    db "+"
+    db 0x08 ; Backspace
+    db 0xFF ; Tab
+    db "q"
+    db "w"
+    db "e"
+    db "r"
+    db "t"
+    db "y"
+    db "u"
+    db "i"
+    db "o"
+    db "p"
+    db "{"
+    db "}"
+    db 0x0A ; Enter
+    db 0xFF ; Left control
+    db "a"
+    db "s"
+    db "d"
+    db "f"
+    db "g"
+    db "h"
+    db "j"
+    db "k"
+    db "l"
+    db ":"
+    db '"'
+    db "~"
+    db 0xFF ; Left shift
+    db "|"
+    db "z"
+    db "x"
+    db "c"
+    db "v"
+    db "b"
+    db "n"
+    db "m"
+    db "<"
+    db ">"
+    db "?"
+    db 0xFF ; Right shift
+    db "*"  ; Keypad *
+    db 0xFF ; Left alt
+    db " "
     db 0xFF ; Capslock
     db 0xFF ; F1
     db 0xFF ; F2

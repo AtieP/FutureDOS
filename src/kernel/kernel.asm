@@ -98,4 +98,4 @@ INITIALIZING_DRIVERS_STR: db "Initializing drivers...",0x00
 REMAPING_INTERRUPTS_STR: db "Remapping interrupts...",0x00
 LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x00
 
-times 2048 - ($ - $$) db 0
+times 2560 - ($ - $$) db 0
