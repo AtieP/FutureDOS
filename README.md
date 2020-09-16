@@ -4,6 +4,8 @@ A Disk Operating System from the Future
 
 ![FutureDOS](https://i.imgur.com/JHNNOCP.png)
 
+Discord Server: https://discord.gg/F2QMxa5
+
 # Status
 Pre-alpha
 
