@@ -3,6 +3,7 @@ cpu 8086
 
 ; __KEYBOARD_IRQ_CALLED: src/kernel/drivers/keyboard.asm
 ; __KEYBOARD_LAST_KEY: src/kernel/drivers/keyboard.asm
+; __KEYBOARD_FLAGS: src/kernel/drivers/keyboard.asm
 
 %define _EXTENDED 0xE0
 %define _NUMLOCK_PRESS 0x45
