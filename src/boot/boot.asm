@@ -9,9 +9,25 @@ org 0x7c00
 jmp short main
 nop
 
+OEMID: db "mkdosfs "
+BYTES_PER_SECTOR: dw 512
+SECTORS_PER_CLUSTER: db 1
+RESERVED_SECTORS: dw 6
+NUMBER_OF_FATS: db 2
+ROOT_DIR_ENTRIES: dw 224
+LOGICAL_SECTORS: dw 2880
+MEDIA_DESCRIPTOR_TYPE: dw 0xF0 ; https://infogalactic.com/info/Design_of_the_FAT_file_system#media
+SECTORS_PER_FAT: dw 9
 SECTORS_PER_TRACK: dw 18
 SIDES: dw 2
+HIDDEN_SECTORS: dd 0
+LARGE_SECTORS: dd 0
 DRIVE_NUMBER: db 0
+FLAGS: db 0 ; Reserved
+SIGNATURE: db 0x29
+VOLUME_ID: dd 0x00001412
+VOLUME_LABEL: db "FUTUREDOS  "
+SYSTEM_ID_STRING: db "FAT12   "
 
 main:
 
