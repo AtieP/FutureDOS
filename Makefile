@@ -1,13 +1,13 @@
 clean:
 	rm bin/*
 	rm disk/*
-	
+
 build:
 	mkdir -p bin
 	mkdir -p disk
 
-	nasm -Isrc -f bin src/boot/boot.asm -o bin/boot.bin
-	nasm -Isrc -f bin src/kernel/kernel.asm -o bin/kernel.bin
+	nasm -i src/ -f bin src/boot/boot.asm -o bin/boot.bin
+	nasm -i src/ -f bin src/kernel/kernel.asm -o bin/kernel.bin
 	cat bin/kernel.bin >> bin/boot.bin
 
 	dd if=/dev/zero of=disk/futuredos.img bs=512 count=2948
