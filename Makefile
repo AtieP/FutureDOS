@@ -1,8 +1,7 @@
 clean:
 	rm bin/*
 	rm disk/*
-	rm -rf mnt
-
+	
 build:
 	mkdir -p bin
 	mkdir -p disk
