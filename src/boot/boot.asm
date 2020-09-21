@@ -253,7 +253,7 @@ puts:
 .end:
     ret
 
-kernString: db "KERNER  BIN"
+kernString: db "KERNEL  BIN"
 
 memOff: dw 0 ; Current kernel loading offset
 currFatSector: dw -1 ; Last FAT sector which was read
