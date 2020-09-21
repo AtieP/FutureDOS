@@ -5,7 +5,7 @@ org 0x7c00
 ; This macro creates a .val children with the default value, so you don't have to compute it at runtime
 %macro DefineVal 3 ; defval <name>, <type>, <default value>
 %1 %2 %3
-%1.val equ %3 
+%1.val equ %3
 %endmacro
 
 jmp short main
@@ -19,7 +19,7 @@ DefineVal .resvSects, dw, 1
 DefineVal .numFats, db, 2
 DefineVal .rootDirEnts, dw, 224
 DefineVal .logSects, dw, 2880
-DefineVal .mediaDescType, db, 0xF0 
+DefineVal .mediaDescType, db, 0xF0
 DefineVal .sectsPerFat, dw, 9
 DefineVal .sectsPerTrack, dw, 18
 DefineVal .sides, dw, 2
@@ -46,7 +46,7 @@ main:
     xor ax, ax
     mov ds, ax
     mov es, ax
-    
+
     ; Set stack
     cli
     mov ax, 0x9000
@@ -56,26 +56,28 @@ main:
 
     ; Save drive number
     mov [BPB.driveNo], dl
-    
+
     ; Detect drive geometry if on hard drive
     or dl, dl
     jz .skipHdd
-        ; INT 0x13, AH=8: Get drive information
-        ; Input: DL = drive index
-        ; Output:
-        ;   DH = last head = num heads - 1
-        ;   CX[0:5] = sectors per track (starting from 1)
-	    mov ah, 8
-	    int 0x13
-	    and cx, 0b111111
-	    mov [BPB.sectsPerTrack], cx ; NOTE: starts from 1
-	    mov dl, dh
-        xor dh, dh
-	    inc dx ; It's the index of the last head (0-based), so add 1
-	    mov [BPB.sides], dx
-    .skipHdd:
 
-    mov bx, eof 
+    ; INT 0x13, AH=8: Get drive information
+    ; Input: DL = drive index
+    ; Output:
+    ;   DH = last head = num heads - 1
+    ;   CX[0:5] = sectors per track (starting from 1)
+	  mov ah, 8
+	  int 0x13
+	  and cx, 0b111111
+	  mov [BPB.sectsPerTrack], cx ; NOTE: starts from 1
+	  mov dl, dh
+    xor dh, dh
+	  inc dx ; It's the index of the last head (0-based), so add 1
+	  mov [BPB.sides], dx
+
+.skipHdd:
+
+    mov bx, eof
     mov ax, BPB.rootDirSect
     call readsect
 
@@ -83,108 +85,107 @@ main:
 
     cld ; Clear direction flag since it might be set at startup
 
-    dirloop:
-        add si, 32 ; Go to the next entry
-        mov al, [si]
-        or al, al ; If first byte is 0, there are no more entries
-        jz exit
+dirloop:
+    add si, 32 ; Go to the next entry
+    mov al, [si]
+    or al, al ; If first byte is 0, there are no more entries
+    jz file_not_found
 
-        cmp al, 0xE5 ; If it's E5, skip this entry
-        je dirloop
+    cmp al, 0xE5 ; If it's E5, skip this entry
+    je dirloop
 
-        mov di, kernString ; String to compare with the entry
-        mov cx, 11
-        rep cmpsb ; Compare the strings, quit if a character differs or if we've completed (similar to memcmp)
+    mov di, kernString ; String to compare with the entry
+    mov cx, 11
+    rep cmpsb ; Compare the strings, quit if a character differs or if we've completed (similar to memcmp)
 
-        ; Set SI to the start of the entry again: cx stores the number of characters after the first non-match
-        add si, cx
-        sub si, 11
+    ; Set SI to the start of the entry again: cx stores the number of characters after the first non-match
+    add si, cx
+    sub si, 11
 
-        or cx, cx ; If all characters matched, quit the loop; otherwise, continue
-        jnz dirloop
-    
-    mov ax, [si+26] ; First sector of the file 
+    or cx, cx ; If all characters matched, quit the loop; otherwise, continue
+    jnz dirloop
 
-    read_loop:
-        cli
+    mov ax, [si+26] ; First sector of the file
 
-        ; Save current sector number
-        push ax
+read_loop:
+    cli
 
-        ; INT 0x13, AH=2 writes in ES:BX
-        mov cx, kernelSegment
-        push cx
-        pop es
+    ; Save current sector number
+    push ax
 
-        add ax, BPB.firstDataSect-2
-        mov bx, [memOff]
-        call readsect
-        add word [memOff], 512
+    ; INT 0x13, AH=2 writes in ES:BX
+    mov cx, kernelSegment
+    push cx
+    pop es
+
+    add ax, BPB.firstDataSect-2
+    mov bx, [memOff]
+    call readsect
+    add word [memOff], 512
 
         ; cluster{ax}
-        pop ax
-        push ax         
+    pop ax
+    push ax
 
-        ; tableoffset{ax} = cluster{ax} * 1.5
-        mov bx, ax
-        shr bx, 1
-        add ax, bx
+    ; tableoffset{ax} = cluster{ax} * 1.5
+    mov bx, ax
+    shr bx, 1
+    add ax, bx
 
-        ; sector{ax} = firstFatSect + tableoffset{ax} / 512
-        ; sectoroffset{dx} = tableoffset{ax} % 512
-        xor dx, dx ; Upper word of division
-        div word [BPB.bytesPerSect]
-        add ax, BPB.firstFatSect
+    ; sector{ax} = firstFatSect + tableoffset{ax} / 512
+    ; sectoroffset{dx} = tableoffset{ax} % 512
+    xor dx, dx ; Upper word of division
+    div word [BPB.bytesPerSect]
+    add ax, BPB.firstFatSect
 
-        push dx ; sectoroffset{dx}
+    push dx ; sectoroffset{dx}
 
 
-        ; Write FAT data after bootsector
-        push ds
-        pop es
+    ; Write FAT data after bootsector
+    push ds
+    pop es
 
-        ; AX = LBA sector
-        ; Optimization: load only if not already in memory
-        cmp ax, [currFatSector]
-        je .skipread
-            mov [currFatSector], ax
-            mov bx, eof 
-            call readsect
-        .skipread:
+    ; AX = LBA sector
+    ; Optimization: load only if not already in memory
+    cmp ax, [currFatSector]
+    je .skipread
+    mov [currFatSector], ax
+    mov bx, eof
+    call readsect
 
-        mov si, eof
-        pop dx ; sectoroffset{dx}
-        add si, dx
-        mov ax, [si] ; Get raw word from sector address
+.skipread:
+    mov si, eof
+    pop dx ; sectoroffset{dx}
+    add si, dx
+    mov ax, [si] ; Get raw word from sector address
 
-        ; Decode sector
-        ; AX = table_value, DX = cluster
-        pop dx ; cluster{dx}
-        
-        ; Each cluster is 3 bytes, but little endian
-        ; ABC DEF is stored as BC FA DE in memory
-        ; converted to BE (how it's stored in registers):
-        ;   even = FA BC, odd = DE FA
-        ; to get the actual index, even = remove nybble (AND 0x0FFF), odd = remove first nybble (>> 4)
-        and dl, 1
-        jz .andval
-        mov cl, 4
-        shr ax, cl
-        jmp .decodeend
-        .andval:
-        and ax, 0x0FFF
-        .decodeend:
-        
-        ; TODO: Handle bad sectors (0xFF7)
-        cmp ax, 0xFF8 ; 0xFF8 and above = End of clusterchain
-        jnge read_loop
-    
+    ; Decode sector
+    ; AX = table_value, DX = cluster
+    pop dx ; cluster{dx}
+
+    ; Each cluster is 3 bytes, but little endian
+    ; ABC DEF is stored as BC FA DE in memory
+    ; converted to BE (how it's stored in registers):
+    ;   even = FA BC, odd = DE FA
+    ; to get the actual index, even = remove nybble (AND 0x0FFF), odd = remove first nybble (>> 4)
+    and dl, 1
+    jz .andval
+    mov cl, 4
+    shr ax, cl
+    jmp .decodeend
+
+.andval:
+    and ax, 0x0FFF
+
+.decodeend:
+
+    ; TODO: Handle bad sectors (0xFF7)
+    cmp ax, 0xFF8 ; 0xFF8 and above = End of clusterchain
+    jnge read_loop
+
     ; Finished reading: jump to kernel
+    sti
     jmp kernelSegment:0
-    
-    exit:
-    jmp $
-
 
 ; Input: AX = LBA sector
 ; Output: AH = status, AL = sectors read, CF set on error (see INT 0x13, AH=2)
@@ -204,16 +205,55 @@ readsect:
 
     pop bx
 
-    mov ax, (2 << 8) | 1 ; 2 = BIOS call number, 1 = sectors to read 
-    mov dl, byte [BPB.driveNo] 
+    mov ax, (2 << 8) | 1 ; 2 = BIOS call number, 1 = sectors to read
+    mov dl, byte [BPB.driveNo]
 
     int 0x13
+
+    jc disk_error
+
+    test ah, ah
+    jnz disk_error
+
+    cmp al, 1
+    jne disk_error
+
     ret
 
-err:
+disk_error:
+    mov si, .DISK_ERROR_STR
+    call puts
     jmp $
 
-kernString: db "KERNEL  BIN"
+.DISK_ERROR_STR: db "Disk error",0x00
+
+file_not_found:
+    mov si, .FILE_NOT_FOUND_STR
+    call puts
+    jmp $
+
+.FILE_NOT_FOUND_STR: db "Kernel file not found (KERNEL.BIN)",0x00
+
+; Prints a null-terminated string
+; IN: Pointer to string in SI
+; OUT: Nothing
+puts:
+    xor ax, ax
+    mov es, ax
+
+    mov ah, 0x0e
+
+.print_each_char:
+    lodsb
+    test al, al
+    jz .end
+    int 10h
+    jmp .print_each_char
+
+.end:
+    ret
+
+kernString: db "KERNER  BIN"
 
 memOff: dw 0 ; Current kernel loading offset
 currFatSector: dw -1 ; Last FAT sector which was read
