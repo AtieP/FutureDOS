@@ -11,18 +11,18 @@ Pre-alpha
 
 # Features
 - Custom CGA driver
-- Custom Keyboard driver
+- Custom keyboard driver
 - Custom error handlers
 - Made to be run on any IBM PC compatible computer
 
 # Build instructions
-You need to install [NASM](https://nasm.us/). Then, run `make build`.  
-**There is currently no known way on how to build this on Windows.**
+You need to install [NASM](https://nasm.us/). Then, run `make build`; the build process uses Linux's loopback mounting facilities, so you might need to insert your `sudo` password.
+**There is currently no known way on how to build this on Windows without WSL2.**
 
 # Run instructions
 There are two ways:  
-- **Not recommended:** Running the OS in a real computer. It must be IBM PC compatible.
 - **Recommended:** Using [QEMU](https://qemu.org/). Install it and then run `make run`.
+- **Not recommended:** Running the OS in a real PC-compatible computer.
 
 # Disclaimer
-I am not responsible for any damages caused by this Disk Operating System, but this should be safe.
+I am not responsible for any damages caused by this OS, but it should be safe.

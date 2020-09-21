@@ -8,6 +8,14 @@ __CGA_CURSOR_Y: dw 0x0000
 init_cga:
     push bx
 
+    ; INT 0x10, AH = 0: Set video mode
+    ; Input AL = video mode, output AL = flags
+    push ax
+    mov ah, 0
+    mov al, 3 ; CGA color textmode
+    int 0x10
+    pop ax
+
     mov bh, 0x0F
     call cga_clear_screen
 
