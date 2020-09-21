@@ -1,3 +1,3 @@
 script:
     - "sudo apt-get install nasm"
-    - "make build"
+    - "sudo make build"
