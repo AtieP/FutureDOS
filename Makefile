@@ -21,4 +21,7 @@ build:
 	rm -rf mnt
 
 run:
-	qemu-system-x86_64  disk/futuredos.img -debugcon stdio
+	qemu-system-x86_64 disk/futuredos.img
+
+debugrun:
+	qemu-system-x86_64 disk/futuredos.img -debugcon stdio

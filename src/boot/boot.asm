@@ -57,19 +57,23 @@ main:
     ; Save drive number
     mov [BPB.driveNo], dl
     
-    ; INT 0x13, AH=8: Get drive information
-    ; Input: DL = drive index
-    ; Output:
-    ;   DH = last head = num heads - 1
-    ;   CX[0:5] = sectors per track (starting from 1)
-	mov ah, 8
-	int 0x13
-	and cx, 0b111111
-	mov [BPB.sectsPerTrack], cx ; NOTE: starts from 1
-	mov dl, dh
-    xor dh, dh
-	inc dx ; It's the index of the last head (0-based), so add 1
-	mov [BPB.sides], dx
+    ; Detect drive geometry if on hard drive
+    or dl, dl
+    jz .skipHdd
+        ; INT 0x13, AH=8: Get drive information
+        ; Input: DL = drive index
+        ; Output:
+        ;   DH = last head = num heads - 1
+        ;   CX[0:5] = sectors per track (starting from 1)
+	    mov ah, 8
+	    int 0x13
+	    and cx, 0b111111
+	    mov [BPB.sectsPerTrack], cx ; NOTE: starts from 1
+	    mov dl, dh
+        xor dh, dh
+	    inc dx ; It's the index of the last head (0-based), so add 1
+	    mov [BPB.sides], dx
+    .skipHdd:
 
     mov bx, eof 
     mov ax, BPB.rootDirSect
