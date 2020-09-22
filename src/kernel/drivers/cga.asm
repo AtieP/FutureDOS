@@ -108,6 +108,7 @@ cga_clear_screen:
     mov ah, bh
 
     mov cx, 2000
+    xor di, di
 
 .fill_screen:
     mov [es:di], word ax
