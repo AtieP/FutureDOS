@@ -35,6 +35,6 @@ keyboard_raw_getkey:
     mov ah, [__KEYBOARD_LAST_KEY]
 
 .end:
-    popf
     pop ds
+    popf
     ret
