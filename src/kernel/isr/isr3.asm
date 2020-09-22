@@ -10,6 +10,10 @@ cpu 8086
 isr3:
     push si
     push bx
+    push ds
+
+    push cs
+    pop ds
 
     sti
 
@@ -20,6 +24,7 @@ isr3:
     mov si, .BREAKPOINT_BODY_STR
     call puts
 
+    pop ds
     pop bx
     pop si
 
@@ -28,6 +33,10 @@ isr3:
     push si
     push bx
     push ax
+    push ds
+
+    push cs
+    pop ds
 
     mov si, .BREAKPOINT_FOOTER_STR
     mov bl, 0x04
@@ -39,6 +48,7 @@ isr3:
 
     call getchar
 
+    pop ds
     pop ax
     pop bx
     pop si

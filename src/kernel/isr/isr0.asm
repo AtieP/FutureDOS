@@ -8,6 +8,10 @@ cpu 8086
 isr0:
     push si
     push bx
+    push ds
+
+    push cs
+    pop ds
 
     mov si, .ERROR_MESSAGE_HEADER_STR
     mov bl, 0x04
@@ -16,14 +20,26 @@ isr0:
     mov si, .ERROR_MESSAGE_BODY_STR
     call puts
 
+    pop ds
     pop bx
     pop si
 
     call print_register_dump
 
+    push si
+    push bx
+    push ds
+
+    push cs
+    pop ds
+
     mov si, .ERROR_MESSAGE_FOOTER_STR
     mov bl, 0x04
     call puts
+
+    pop ds
+    pop bx
+    pop si
 
     jmp $
 
