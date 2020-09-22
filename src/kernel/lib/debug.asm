@@ -9,7 +9,6 @@ cpu 8086
 ; (first CS and then IP).
 ; NOTE: CS and IP are NOT POPPED. You NEED TO POP THEM FROM THE STACK YOURSELF
 ; AFTER THIS FUNCTION.
-; Please note that there is no support for DS, ES, and SS.
 
 %define _REGISTER_NAME_COLOR 0x0F
 %define _REGISTER_VALUE_COLOR 0x07
@@ -31,11 +30,16 @@ print_register_dump:
     push bx
     push dx
     push si
+    push ds
 
+    push ds
     push si
     push sp
     push dx
     push bx
+
+    push cs
+    pop ds
 
     ; ------------------
     ; DUMP AX
@@ -199,12 +203,69 @@ print_register_dump:
     _PRINT_SPACE
 
     ; ------------------
+    ; DUMP DS
+
+    ; Convert DS value to ASCII
+    pop dx
+    call itohex
+
+    ; Print "DS: "
+    mov si, .REGISTER_DS_STR
+    mov bl, _REGISTER_NAME_COLOR
+    call puts
+
+    ; Print the value of DS
+    mov si, .HEX_BUFFER
+    mov bl, _REGISTER_VALUE_COLOR
+    call puts
+
+    _PRINT_SPACE
+
+    ; ------------------
+    ; DUMP ES
+
+    ; Convert ES value to ASCII
+    mov dx, es
+    call itohex
+
+    ; Print "ES: "
+    mov si, .REGISTER_ES_STR
+    mov bl, _REGISTER_NAME_COLOR
+    call puts
+
+    ; Print the value of ES
+    mov si, .HEX_BUFFER
+    mov bl, _REGISTER_VALUE_COLOR
+    call puts
+
+    _PRINT_SPACE
+
+    ; ------------------
+    ; DUMP SS
+
+    ; Convert SS value to ASCII
+    mov dx, ss
+    call itohex
+
+    ; Print "SS: "
+    mov si, .REGISTER_SS_STR
+    mov bl, _REGISTER_NAME_COLOR
+    call puts
+
+    ; Print the value of SS
+    mov si, .HEX_BUFFER
+    mov bl, _REGISTER_VALUE_COLOR
+    call puts
+
+    _PRINT_NEW_LINE
+
+    ; ------------------
     ; DUMP CS
 
     ; Convert CS value to ASCII
     push bp
     mov bp, sp
-    mov dx, [bp + 14]
+    mov dx, [bp + 16]
     call itohex
 
     ; Print "CS: "
@@ -223,7 +284,7 @@ print_register_dump:
     ; DUMP IP
 
     ; Convert IP value to ASCII
-    mov dx, [bp + 12]
+    mov dx, [bp + 14]
     call itohex
 
     ; Print "IP: "
@@ -237,6 +298,7 @@ print_register_dump:
 
     pop bp
 
+    pop ds
     pop si
     pop dx
     pop bx
@@ -253,6 +315,9 @@ print_register_dump:
 .REGISTER_DI_STR: db "DI: ",0x00
 .REGISTER_SI_STR: db "SI: ",0x00
 .REGISTER_CS_STR: db "CS: ",0x00
+.REGISTER_DS_STR: db "DS: ",0x00
+.REGISTER_ES_STR: db "ES: ",0x00
+.REGISTER_SS_STR: db "SS: ",0x00
 .REGISTER_IP_STR: db "IP: ",0x00
 
 .HEX_BUFFER: db "0x0000",0x00
