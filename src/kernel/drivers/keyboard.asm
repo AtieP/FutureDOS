@@ -18,6 +18,11 @@ __KEYBOARD_FLAGS:
 ; OUT: AH = Keycode
 keyboard_raw_getkey:
     pushf
+    push ds
+
+    push cs
+    pop ds
+
     mov [__KEYBOARD_IRQ_CALLED], byte 0
 
 .check_if_irq_was_triggered:
@@ -31,4 +36,5 @@ keyboard_raw_getkey:
 
 .end:
     popf
+    pop ds
     ret

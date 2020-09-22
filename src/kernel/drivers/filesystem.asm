@@ -48,6 +48,9 @@ init_fs:
     push ds
     push es
 
+    push cs
+    pop es
+
     xor cx, cx
     mov ds, ax
 

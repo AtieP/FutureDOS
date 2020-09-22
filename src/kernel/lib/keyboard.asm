@@ -13,8 +13,12 @@ cpu 8086
 ; OUT: AH = Keycode, AL = ASCII representation of the keycode
 getchar:
     push si
+    push ds
     pushf
     xor ax, ax
+
+    push cs
+    pop ds
 
 .check_not_keyrelease:
     call keyboard_raw_getkey
@@ -62,6 +66,7 @@ getchar:
     lodsb
 
     popf
+    pop ds
     pop si
     ret
 
@@ -84,7 +89,11 @@ gets:
     push cx
     push dx
     push di
+    push ds
     pushf
+
+    push cs
+    pop ds
 
     cld
     xor dx, dx
@@ -119,6 +128,7 @@ gets:
     stosb
 
     popf
+    pop ds
     pop di
     pop dx
     pop cx
@@ -136,7 +146,11 @@ getsp:
     push cx
     push dx
     push di
+    push ds
     pushf
+
+    push cs
+    pop ds
 
     cld
     xor dx, dx
@@ -180,6 +194,7 @@ getsp:
     call putc
 
     popf
+    pop ds
     pop di
     pop dx
     pop cx
