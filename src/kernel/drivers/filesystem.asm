@@ -57,9 +57,6 @@ init_fs:
     mov cx, 59
     rep movsb
 
-    mov cx, _KERNEL_SEGMENT
-    mov ds, ax
-
     pop es
     pop ds
     pop di
