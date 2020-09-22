@@ -32,6 +32,7 @@ kmain:
     call init_cga
 
     PRINT_TRACE INITIALIZING_DRIVERS_STR
+    call init_fs
     PRINT_DONE
 
     PRINT_TRACE REMAPING_INTERRUPTS_STR
@@ -78,6 +79,7 @@ init_ivt:
 
 
 %include "kernel/drivers/cga.asm"
+%include "kernel/drivers/filesystem.asm"
 %include "kernel/drivers/keyboard.asm"
 
 %include "kernel/lib/debug.asm"
