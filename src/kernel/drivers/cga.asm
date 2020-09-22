@@ -31,8 +31,12 @@ cga_putc:
     push cx
     push dx
     push di
+    push ds
     push es
     pushf
+
+    push cs
+    pop ds
 
     mov ah, bl
 
@@ -77,6 +81,7 @@ cga_putc:
 .end:
     popf
     pop es
+    pop ds
     pop di
     pop dx
     pop cx
@@ -129,6 +134,10 @@ cga_move_cursor:
     push ax
     push bx
     push dx
+    push ds
+
+    push cs
+    pop ds
 
     mov [__CGA_CURSOR_X], bx
     mov [__CGA_CURSOR_Y], cx
@@ -156,6 +165,7 @@ cga_move_cursor:
     mov al, bh
     out dx, al
 
+    pop ds
     pop dx
     pop bx
     pop ax
@@ -165,8 +175,15 @@ cga_move_cursor:
 ; IN: Nothing
 ; OUT: X position in BX, Y position in CX
 cga_get_cursor:
+    push ds
+
+    push cs
+    pop ds
+
     mov bx, [__CGA_CURSOR_X]
     mov cx, [__CGA_CURSOR_Y]
+
+    pop ds
     ret
 
 ; Scrolls.
@@ -177,7 +194,11 @@ cga_scroll:
     push cx
     push si
     push di
+    push ds
     push es
+
+    push cs
+    pop ds
 
     mov ax, 0xb800
     mov es, ax
@@ -203,6 +224,7 @@ cga_scroll:
     call cga_move_cursor
 
     pop es
+    pop ds
     pop di
     pop si
     pop cx
