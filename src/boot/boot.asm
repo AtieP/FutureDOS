@@ -239,7 +239,7 @@ file_not_found:
 ; OUT: Nothing
 puts:
     xor ax, ax
-    mov es, ax
+    mov ds, ax
 
     mov ah, 0x0e
 
