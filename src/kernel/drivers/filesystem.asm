@@ -54,6 +54,9 @@ init_fs:
     xor cx, cx
     mov ds, cx
 
+    mov si, 0x7c00 + 3
+    mov di, __FS_BIOS_PARAMETER_BLOCK
+
     mov cx, 59
     rep movsb
 
