@@ -52,10 +52,7 @@ init_fs:
     pop es
 
     xor cx, cx
-    mov ds, ax
-
-    mov si, 0x7c00 + 3
-    mov di, __FS_BIOS_PARAMETER_BLOCK
+    mov ds, cx
 
     mov cx, 59
     rep movsb
