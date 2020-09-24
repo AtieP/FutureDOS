@@ -31,12 +31,12 @@ kmain:
 
     call init_cga
 
-    PRINT_TRACE INITIALIZING_DRIVERS_STR
-    call init_fs
-    PRINT_DONE
-
     PRINT_TRACE REMAPING_INTERRUPTS_STR
     call init_ivt
+    PRINT_DONE
+
+    PRINT_TRACE INITIALIZING_DRIVERS_STR
+    call init_fs
     PRINT_DONE
 
     PRINT_TRACE LOADED_SUCCESSFULLY_STR
