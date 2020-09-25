@@ -190,8 +190,6 @@ read_loop:
 ; Input: AX = LBA sector
 ; Output: AH = status, AL = sectors read, CF set on error (see INT 0x13, AH=2)
 readsect:
-    push bx
-
     xor dx, dx ; Upper word of division
     div word [BPB.sectsPerTrack]
     inc dl ; CHS sectors are 1-indexed
@@ -202,8 +200,6 @@ readsect:
     div word [BPB.sides]
     mov dh, dl ; cluster = lba / sectsPerTrack % sides
     mov ch, al ; head = lba / sectsPerTrack / sides
-
-    pop bx
 
     mov ax, (2 << 8) | 1 ; 2 = BIOS call number, 1 = sectors to read
     mov dl, byte [BPB.driveNo]
