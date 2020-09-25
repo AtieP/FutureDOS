@@ -234,8 +234,8 @@ file_not_found:
 ; IN: Pointer to string in SI
 ; OUT: Nothing
 puts:
-    xor ax, ax
-    mov ds, ax
+    push cs
+    pop ds
 
     mov ah, 0x0e
 
