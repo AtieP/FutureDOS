@@ -124,7 +124,6 @@ fs_load_file:
     add di, 32
     mov al, [di]
 
-    int3
     ; End
     test al, al
     jz .error
