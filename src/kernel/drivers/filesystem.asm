@@ -135,7 +135,7 @@ fs_load_file:
     push di
     push si
 
-    mov cx, 11
+    mov cx, 12
     rep cmpsb
 
     pop si
