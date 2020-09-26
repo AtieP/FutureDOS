@@ -124,6 +124,7 @@ fs_load_file:
     add di, 32
     mov al, [di]
 
+    int3
     ; End
     test al, al
     jz .error
@@ -132,11 +133,14 @@ fs_load_file:
     cmp al, 0xE5
     je .check_if_file_exists
 
+    push di
+    push si
+
     mov cx, 11
     rep cmpsb
 
-    add di, cx
-    sub di, 11
+    pop si
+    pop di
 
     test cx, cx
     jnz .check_if_file_exists
