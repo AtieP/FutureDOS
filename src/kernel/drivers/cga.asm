@@ -16,7 +16,7 @@ init_cga:
     int 0x10
     pop ax
 
-    mov bh, 0x0F
+    mov bl, 0x0F
     call cga_clear_screen
 
     pop bx
@@ -90,7 +90,7 @@ cga_putc:
     ret
 
 ; Clears the screen and places the cursor left at the top.
-; IN: BH = Color
+; IN: BL = Color
 ; OUT: Nothing
 cga_clear_screen:
     push ax
@@ -105,7 +105,7 @@ cga_clear_screen:
 
     ; NULL + Color
     xor ax, ax
-    mov ah, bh
+    mov ah, bl
 
     mov cx, 2000
     xor di, di
