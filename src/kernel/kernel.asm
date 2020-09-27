@@ -5,6 +5,10 @@ org 0
 %define _KERNEL_SEGMENT 0x0800
 %define _KERNEL_OFFSET 0x0000
 
+%define _DEFAULT_FILE_NAME "TERMINALBIN"
+%define _DEFAULT_FILE_SEGMENT 0x0900
+%define _DEFAULT_FILE_OFFSET 0x0000
+
 %macro _PRINT_DONE 0
     mov bl, 0x02
     mov si, _DONE_STR
@@ -39,13 +43,40 @@ kmain:
     call init_fs
     _PRINT_DONE
 
-    _PRINT_TRACE .LOADED_SUCCESSFULLY_STR
+    _PRINT_TRACE .LOADING_DEFAULT_FILE_STR
+    mov ax, _DEFAULT_FILE_SEGMENT
+    mov es, ax
+    mov bx, _DEFAULT_FILE_OFFSET
+    mov si, .DEFAULT_FILE
+    call fs_load_file
+    jc .file_load_error
 
+    _PRINT_DONE
+
+    mov si, .LOADED_SUCCESSFULLY_STR
+    mov bl, 0x0F
+    call puts
+
+    ; Call the program, if it returns then hang
+    call _DEFAULT_FILE_SEGMENT:_DEFAULT_FILE_OFFSET
     jmp hang
+
+.file_load_error:
+    _PRINT_FAIL
+    mov si, .file_load_error.FILE_NOT_FOUND_STR
+    mov bl, 0x0F
+    call puts
+    jmp hang
+
+; Note: please change this string if _DEFAULT_FILE_NAME is changed too
+.file_load_error.FILE_NOT_FOUND_STR: db "File TERMINAL.BIN not found",0x00
 
 .INITIALIZING_DRIVERS_STR: db "Initializing drivers...",0x00
 .REMAPING_INTERRUPTS_STR: db "Remapping interrupts...",0x00
-.LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x00
+.LOADING_DEFAULT_FILE_STR: db "Loading default file...",0x00
+.LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x0A,0x0A,0x0D,0x00
+
+.DEFAULT_FILE: db _DEFAULT_FILE_NAME
 
 
 hang:

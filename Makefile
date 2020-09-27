@@ -10,6 +10,8 @@ build:
 	nasm -i src/ -f bin src/boot/boot.asm -o bin/boot.bin
 	nasm -i src/ -f bin src/kernel/kernel.asm -o bin/kernel.bin
 
+	nasm -f bin apps/terminal.asm -o bin/terminal.bin
+
 	dd if=/dev/zero of=disk/futuredos.img bs=1024 count=1440
 	mkfs.msdos disk/futuredos.img
 	dd if=bin/boot.bin of=disk/futuredos.img bs=512 count=1 conv=notrunc
@@ -17,6 +19,7 @@ build:
 	mkdir -p mnt
 	sudo mount -o loop -t msdos disk/futuredos.img mnt
 	sudo cp bin/kernel.bin mnt/kernel.bin
+	sudo cp bin/terminal.bin mnt/terminal.bin
 	sudo umount disk/futuredos.img
 	rm -rf mnt
 
