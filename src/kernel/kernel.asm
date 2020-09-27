@@ -122,7 +122,6 @@ init_ivt:
 %include "kernel/lib/debug.asm"
 %include "kernel/lib/keyboard.asm"
 %include "kernel/lib/screen.asm"
-%include "kernel/lib/string.asm"
 
 %include "kernel/isr/isr0.asm"
 %include "kernel/isr/isr3.asm"

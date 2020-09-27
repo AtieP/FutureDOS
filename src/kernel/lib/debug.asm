@@ -3,7 +3,6 @@ cpu 8086
 
 ; putc: src/kernel/lib/screen.asm
 ; puts: src/kernel/lib/screen.asm
-; itohex: src/kernel/lib/string.asm
 
 ; Prints a register dump. To be able to print CS and IP, push them
 ; (first CS and then IP).
@@ -47,7 +46,7 @@ print_register_dump:
     ; Convert AX value to ASCII
     mov si, .HEX_BUFFER
     mov dx, ax
-    call itohex
+    call _itohex
 
     ; Print "AX: "
     mov si, .REGISTER_AX_STR
@@ -67,7 +66,7 @@ print_register_dump:
 
     ; Convert BX value to ASCII
     mov dx, bx
-    call itohex
+    call _itohex
 
     ; Print "BX: "
     mov si, .REGISTER_BX_STR
@@ -86,7 +85,7 @@ print_register_dump:
 
     ; Convert CX value to ASCII
     mov dx, cx
-    call itohex
+    call _itohex
 
     ; Print "CX: "
     mov si, .REGISTER_CX_STR
@@ -105,7 +104,7 @@ print_register_dump:
 
     ; Convert DX value to ASCII
     pop dx
-    call itohex
+    call _itohex
 
     ; Print "DX: "
     mov si, .REGISTER_DX_STR
@@ -130,7 +129,7 @@ print_register_dump:
     ; - Return address on the stack
     ; - IP and CS on the stack
     add dx, 16
-    call itohex
+    call _itohex
 
     ; Print "SP: "
     mov si, .REGISTER_SP_STR
@@ -149,7 +148,7 @@ print_register_dump:
 
     ; Convert BP value to ASCII
     mov dx, bp
-    call itohex
+    call _itohex
 
     ; Print "BP: "
     mov si, .REGISTER_BP_STR
@@ -168,7 +167,7 @@ print_register_dump:
 
     ; Convert DI value to ASCII
     mov dx, di
-    call itohex
+    call _itohex
 
     ; Print "DI: "
     mov si, .REGISTER_DI_STR
@@ -188,7 +187,7 @@ print_register_dump:
     ; Convert SI value to ASCII
     pop dx
     mov si, .HEX_BUFFER
-    call itohex
+    call _itohex
 
     ; Print "SI: "
     mov si, .REGISTER_SI_STR
@@ -207,7 +206,7 @@ print_register_dump:
 
     ; Convert DS value to ASCII
     pop dx
-    call itohex
+    call _itohex
 
     ; Print "DS: "
     mov si, .REGISTER_DS_STR
@@ -226,7 +225,7 @@ print_register_dump:
 
     ; Convert ES value to ASCII
     mov dx, es
-    call itohex
+    call _itohex
 
     ; Print "ES: "
     mov si, .REGISTER_ES_STR
@@ -245,7 +244,7 @@ print_register_dump:
 
     ; Convert SS value to ASCII
     mov dx, ss
-    call itohex
+    call _itohex
 
     ; Print "SS: "
     mov si, .REGISTER_SS_STR
@@ -266,7 +265,7 @@ print_register_dump:
     push bp
     mov bp, sp
     mov dx, [bp + 16]
-    call itohex
+    call _itohex
 
     ; Print "CS: "
     mov si, .REGISTER_CS_STR
@@ -285,7 +284,7 @@ print_register_dump:
 
     ; Convert IP value to ASCII
     mov dx, [bp + 14]
-    call itohex
+    call _itohex
 
     ; Print "IP: "
     mov si, .REGISTER_IP_STR
@@ -326,3 +325,48 @@ print_register_dump:
 %undef _REGISTER_VALUE_COLOR
 %unmacro _PRINT_SPACE 0
 %unmacro _PRINT_NEW_LINE 0
+
+; Converts a 16-bit integer to a string. In hexadecimal.
+; IN: DX = 16-bit integer, SI = The place where the string will be put
+; (note: 6 bytes required)
+; OUT: Nothing
+_itohex:
+    push ax
+    push bx
+    push cx
+    push dx
+    pushf
+
+    xor cx, cx
+
+.nibble_to_char:
+    cmp cx, 4
+    je .end
+
+    mov ax, dx
+    ; Mask first three 0s
+    and ax, 0x000f
+    ; Convert to ASCII
+    add al, 0x30
+    cmp al, 0x39
+    jle .write_to_buffer
+    ; Convert to A, B, C...
+    add al, 7
+
+.write_to_buffer:
+    mov bx, si
+    add bx, 5
+    sub bx, cx
+    mov [bx], al
+    times 4 ror dx, 1
+
+    inc cx
+    jmp .nibble_to_char
+
+.end:
+    popf
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
