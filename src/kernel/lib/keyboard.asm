@@ -1,7 +1,7 @@
 bits 16
 cpu 8086
 
-%include "kernel/lib/keycodes.inc"
+%include "kernel/inc/keycodes.inc"
 
 ; cga_get_cursor: src/kernel/drivers/cga.asm
 ; keyboard_raw_getkey: src/kernel/drivers/keyboard.asm
