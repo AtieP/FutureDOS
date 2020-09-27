@@ -123,6 +123,7 @@ init_ivt:
 %include "kernel/drivers/keyboard.asm"
 
 %include "kernel/lib/debug.asm"
+%include "kernel/lib/filesystem.asm"
 %include "kernel/lib/keyboard.asm"
 %include "kernel/lib/screen.asm"
 
