@@ -5,19 +5,19 @@ org 0
 %define _KERNEL_SEGMENT 0x0800
 %define _KERNEL_OFFSET 0x0000
 
-%macro PRINT_DONE 0
+%macro _PRINT_DONE 0
     mov bl, 0x02
-    mov si, DONE_STR
+    mov si, _DONE_STR
     call puts
 %endmacro
 
-%macro PRINT_FAIL 0
+%macro _PRINT_FAIL 0
     mov bl, 0x04
-    mov si, FAIL_STR
+    mov si, _FAIL_STR
     call puts
 %endmacro
 
-%macro PRINT_TRACE 1
+%macro _PRINT_TRACE 1
     mov bl, 0x0F
     mov si, %1
     call puts
@@ -31,15 +31,21 @@ kmain:
 
     call init_cga
 
-    PRINT_TRACE REMAPING_INTERRUPTS_STR
+    _PRINT_TRACE .REMAPING_INTERRUPTS_STR
     call init_ivt
-    PRINT_DONE
+    _PRINT_DONE
 
-    PRINT_TRACE INITIALIZING_DRIVERS_STR
+    _PRINT_TRACE .INITIALIZING_DRIVERS_STR
     call init_fs
-    PRINT_DONE
+    _PRINT_DONE
 
-    PRINT_TRACE LOADED_SUCCESSFULLY_STR
+    _PRINT_TRACE .LOADED_SUCCESSFULLY_STR
+
+    jmp hang
+
+.INITIALIZING_DRIVERS_STR: db "Initializing drivers...",0x00
+.REMAPING_INTERRUPTS_STR: db "Remapping interrupts...",0x00
+.LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x00
 
 
 hang:
@@ -93,12 +99,8 @@ init_ivt:
 %include "kernel/isr/isr8.asm"
 %include "kernel/isr/isr9.asm"
 
-DONE_STR: db " DONE",0x0A,0x0D,0x00
-FAIL_STR: db " FAIL",0x0A,0x0D,0x00
-
-INITIALIZING_DRIVERS_STR: db "Initializing drivers...",0x00
-REMAPING_INTERRUPTS_STR: db "Remapping interrupts...",0x00
-LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x00
+_DONE_STR: db " DONE",0x0A,0x0D,0x00
+_FAIL_STR: db " FAIL",0x0A,0x0D,0x00
 
 times 3072 - ($ - $$) db 0
 
