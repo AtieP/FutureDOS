@@ -128,6 +128,29 @@ fs_load_file:
 .file_segment: dw 0x0000
 .file_offset: dw 0x0000
 
+; Returns the BPB data.
+; IN: DI = Place to put the BPB data
+; OUT: Nothing
+fs_get_bpb:
+    push cx
+    push si
+    push di
+    push ds
+
+    push cs
+    pop ds
+
+    mov si, __FS_BIOS_PARAMETER_BLOCK
+
+    mov cx, 59
+    rep movsb
+
+    pop ds
+    pop di
+    pop si
+    pop cx
+    ret
+
 ; IN: AX = Logical sector
 ; OUT: Correct data for int 13h
 _lba_to_chs:
