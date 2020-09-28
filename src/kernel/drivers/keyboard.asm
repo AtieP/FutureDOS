@@ -23,6 +23,8 @@ keyboard_raw_getkey:
     push cs
     pop ds
 
+    sti
+
     mov [__KEYBOARD_IRQ_CALLED], byte 0
 
 .check_if_irq_was_triggered:
