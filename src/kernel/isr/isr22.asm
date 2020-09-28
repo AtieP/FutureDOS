@@ -25,6 +25,12 @@ isr22:
     dec ah
     jz .ah_6
 
+    dec ah
+    jz .ah_7
+
+    dec ah
+    jz .ah_8
+
     jmp .error
 
 .ah_1:
@@ -61,6 +67,18 @@ isr22:
     pop ax
     popf
     call puts
+    jmp .end
+
+.ah_7:
+    pop ax
+    popf
+    call fs_load_file
+    jmp .end
+
+.ah_8:
+    pop ax
+    popf
+    call fs_get_bpb
     jmp .end
 
 .error:
