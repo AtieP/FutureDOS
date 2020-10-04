@@ -43,6 +43,28 @@ kmain:
     call init_fs
     _PRINT_DONE
 
+    ; Load splash screen
+    mov dx, 0x3D4   ; CGA CRTC Index Register
+    mov al, 0x09    ; Maximum Scan Line Reigster
+    out dx, al
+    inc dx          ; CGA CRTC Data Port
+    mov al, 0x03    ; 4 scan lines
+    out dx, al
+
+    push es
+    mov ax, 0xb800
+    mov es, ax
+    xor bx, bx
+    mov si, .SPLASH_SCREEN_FILE
+    call fs_load_file
+    pop es
+    jc .load_default_file
+
+    call getchar
+
+.load_default_file:
+    call init_cga
+
     _PRINT_TRACE .LOADING_DEFAULT_FILE_STR
     mov ax, _DEFAULT_FILE_SEGMENT
     mov es, ax
@@ -77,7 +99,7 @@ kmain:
 .LOADED_SUCCESSFULLY_STR: db "FutureDOS started successfully.",0x0A,0x0A,0x0D,0x00
 
 .DEFAULT_FILE: db _DEFAULT_FILE_NAME
-
+.SPLASH_SCREEN_FILE: db "SPLASH  CGA"
 
 hang:
     hlt

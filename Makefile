@@ -20,6 +20,7 @@ build:
 	sudo mount -o loop -t msdos disk/futuredos.img mnt
 	sudo cp bin/kernel.bin mnt/kernel.bin
 	sudo cp bin/terminal.bin mnt/terminal.bin
+	sudo cp splash.cga mnt/splash.cga
 	sudo umount disk/futuredos.img
 	rm -rf mnt
 
