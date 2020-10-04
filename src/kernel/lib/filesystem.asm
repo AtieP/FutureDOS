@@ -173,6 +173,11 @@ fs_load_file:
     clc
 
 .return:
+    push cs
+    pop ds
+
+    mov [.current_fat_sector], word -1
+
     pop ds
     pop es
     pop di
@@ -182,7 +187,6 @@ fs_load_file:
     pop bx
     pop ax
     ret
-
 
 .file_segment: dw 0x0000
 .file_offset: dw 0x0000
