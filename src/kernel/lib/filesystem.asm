@@ -79,11 +79,11 @@ fs_load_file:
 
     mov ax, [di+26]
 
-.load_file:
-    ; Load the file
-
+.load_cluster:
     push cs
     pop ds
+
+    mov [.cluster], ax
 
     add ax, __FS_BIOS_PARAMETER_BLOCK.firstDataSect - 2
     call _lba_to_chs
@@ -93,6 +93,7 @@ fs_load_file:
     mov ax, (2 << 8) | 1
     mov bx, [.file_offset]
     int 13h
+    add [.file_offset], word 512
 
     jc .error
 
@@ -101,6 +102,64 @@ fs_load_file:
 
     cmp al, 1
     jne .error
+
+    ; Table offset
+    mov ax, [.cluster]
+    mov bx, ax
+    shr bx, 1
+    add ax, bx
+
+    ; Sector offset
+    xor dx, dx
+    div word [__FS_BIOS_PARAMETER_BLOCK.bytesPerSect]
+    add ax, __FS_BIOS_PARAMETER_BLOCK.firstFatSect
+
+    mov [.sector_offset], dx
+
+    push cs
+    pop es
+
+    ; Load FAT
+    ; Load only if it wasn't loaded
+    cmp ax, [.current_fat_sector]
+    je .dont_read_fat
+
+    mov [.current_fat_sector], ax
+
+    call _lba_to_chs
+
+    mov ax, (2 << 8) | 1
+    mov bx, keof
+    int 13h
+
+    jc .error
+
+    test ah, ah
+    jnz .error
+
+    cmp al, 1
+    jne .error
+
+.dont_read_fat:
+    mov si, keof
+    mov dx, [.sector_offset]
+    add si, dx
+    mov ax, [si]
+
+    mov dx, [.cluster]
+
+    and dl, 1
+    jz .and_value
+    mov cl, 4
+    shr ax, cl
+    jmp .end_decoding
+
+.and_value:
+    and ax, 0x0FFF
+
+.end_decoding:
+    cmp ax, 0x0FF8
+    jnge .load_cluster
 
     jmp .finish
 
@@ -127,6 +186,11 @@ fs_load_file:
 
 .file_segment: dw 0x0000
 .file_offset: dw 0x0000
+
+.cluster: dw 0x0000
+.sector_offset: dw 0x0000
+
+.current_fat_sector: dw -1
 
 ; Returns the BPB data.
 ; IN: DI = Place to put the BPB data
