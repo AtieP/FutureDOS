@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.com/AtieP/dpyjs-bot.svg?branch=master)](https://travis-ci.com/AtieP/dpyjs-bot)  
 A Disk Operating System from the Future
 
-![FutureDOS](https://imgur.com/a/PAqfLEe)
+![FutureDOS](https://i.imgur.com/YvTQu9z.png)
 
 Discord Server: https://discord.gg/F2QMxa5
 
