@@ -40,7 +40,7 @@ main:
     call str_startswith
     jnc .reset
 
-    ; Check if input is a file
+    ; Display error message
     mov ah, 0x06
     mov si, DATA.ERROR_MESSAGE
     mov bl, [DATA.ERROR_COLOR]
