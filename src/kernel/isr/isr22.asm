@@ -86,4 +86,24 @@ isr22:
     popf
 
 .end:
+    ; Some functions set flags at the end. But when an interrupt is called,
+    ; the flags from the caller are pushed into the stack and then, when iret is executed,
+    ; they are popped. This will update the flags.
+
+    ; Check if the carry flag not is set. (Carry flag is the most used flag for output register)
+    jnc .return
+
+    push ax
+    push bp
+
+    mov bp, sp
+
+    lahf
+    or ah, 1
+    mov [bp+8], ah
+
+    pop bp
+    pop ax
+
+.return:
     iret
