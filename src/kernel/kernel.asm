@@ -130,8 +130,8 @@ init_ivt:
     mov [0x24], word isr9
     mov [0x26], word cs
 
-    mov [0x88], word isr22
-    mov [0x8A], word cs
+    mov [0x3F4], word isrFD
+    mov [0x3F6], word cs
 
     sti
 
@@ -154,7 +154,7 @@ init_ivt:
 %include "kernel/isr/isr6.asm"
 %include "kernel/isr/isr8.asm"
 %include "kernel/isr/isr9.asm"
-%include "kernel/isr/isr22.asm"
+%include "kernel/isr/isrFD.asm"
 
 _DONE_STR: db " DONE",0x0A,0x0D,0x00
 _FAIL_STR: db " FAIL",0x0A,0x0D,0x00

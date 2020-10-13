@@ -1,9 +1,9 @@
 ; All the calls here are from src/kernel/lib
 
-; Handler for FutureDOS' library call interrupt (int 22h)
+; Handler for FutureDOS' library call interrupt (int FDh)
 ; print_register_dump is not included because it will be useless, AX is overwritten when
 ; specifying the service number; Use int3 instead
-isr22:
+isrFD:
     pushf
     push ax
 

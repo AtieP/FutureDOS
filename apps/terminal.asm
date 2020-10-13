@@ -13,21 +13,21 @@ main:
     ; Print a new line
     mov ax, (0x05 << 8) | 0x0A
     mov bl, [DATA.NORMAL_COLOR]
-    int 22h
+    int 0xFD
 
     mov al, 0x0D
-    int 22h
+    int 0xFD
 
     ; Print prompt
     mov ah, 0x06
     mov si, DATA.PROMPT_STR
-    int 22h
+    int 0xFD
 
     ; Read input
     mov ah, 0x04
     mov di, DATA.BUFFER
     mov cx, DATA.BUFFER.LEN
-    int 22h
+    int 0xFD
 
     ; Check if the input is internal commands
     mov si, DATA.COMMANDS.ECHO
@@ -40,11 +40,20 @@ main:
     call str_startswith
     jnc .reset
 
+    ; Load a file, if the input was a file
+    mov si, DATA.FILE
+    mov ax, 0x1000
+    mov es, ax
+    xor bx, bx
+    mov ah, 0x07
+    int 0xFD
+    jnc .jump
+
     ; Display error message
     mov ah, 0x06
     mov si, DATA.ERROR_MESSAGE
     mov bl, [DATA.ERROR_COLOR]
-    int 22h
+    int 0xFD
 
     jmp .read_loop
 
@@ -54,7 +63,7 @@ main:
     inc si
 
     mov ah, 0x06
-    int 22h
+    int 0xFD
     jmp .read_loop
 
 .reset:
