@@ -40,15 +40,6 @@ main:
     call str_startswith
     jnc .reset
 
-    ; Load a file, if the input was a file
-    mov si, DATA.FILE
-    mov ax, 0x1000
-    mov es, ax
-    xor bx, bx
-    mov ah, 0x07
-    int 0xFD
-    jnc .jump
-
     ; Display error message
     mov ah, 0x06
     mov si, DATA.ERROR_MESSAGE
