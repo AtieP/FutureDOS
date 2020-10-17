@@ -40,6 +40,21 @@ main:
     call str_startswith
     jnc .reset
 
+    ; Check if the input is a file
+    push es
+    mov si, DATA.BUFFER
+    mov ax, 0x1900 ; 64 KB after the current segment (0x0900)
+    mov es, ax
+    xor bx, bx
+    mov ah, 0x07
+    int 0xFD
+    pop es
+    jc .error
+
+    call 0x1900:0x0000
+    jmp .read_loop
+
+.error:
     ; Display error message
     mov ah, 0x06
     mov si, DATA.ERROR_MESSAGE
@@ -66,15 +81,13 @@ DATA:
 .ERROR_COLOR: db 0x04
 .BUFFER: times 127 db 0x00
 .BUFFER.LEN: equ $ - .BUFFER - 1 ; Substract the NULL end byte
-.ERROR_MESSAGE: db "Invalid command provided",0x00
+.ERROR_MESSAGE: db "Invalid command or filename provided",0x00
 
 .COMMANDS:
 .COMMANDS.ECHO: db "echo"
 .COMMANDS.ECHO.LEN: equ $ - .COMMANDS.ECHO
 .COMMANDS.RESET: db "reset"
 .COMMANDS.RESET.LEN: equ $ - .COMMANDS.RESET
-
-.FILE: db "TERMINALBIN"
 
 ; Clears the command buffer.
 ; IN/OUT: Nothing
