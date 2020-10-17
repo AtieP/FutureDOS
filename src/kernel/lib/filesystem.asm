@@ -55,7 +55,7 @@ fs_load_file:
 
 .check_if_file_exists:
     add di, 32
-    mov al, [di]
+    mov al, [es:di]
 
     ; End
     test al, al
@@ -77,7 +77,7 @@ fs_load_file:
     test cx, cx
     jnz .check_if_file_exists
 
-    mov ax, [di+26]
+    mov ax, [es:di+26]
 
 .load_cluster:
     push cs
