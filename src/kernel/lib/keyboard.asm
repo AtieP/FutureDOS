@@ -100,6 +100,8 @@ gets:
 
 .get_key_loop:
     call getchar
+    cmp al, 0xFF
+    jmp .get_key_loop
 
     cmp ah, KEY_BACKSPACE
     je .backspace
@@ -157,6 +159,8 @@ getsp:
 
 .get_key_loop:
     call getchar
+    cmp al, 0xFF
+    je .get_key_loop
 
     cmp ah, KEY_BACKSPACE
     je .backspace
