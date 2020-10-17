@@ -41,6 +41,15 @@ main:
     jnc .reset
 
     ; Check if the input is a file
+    ; Make sure it ends on .BIN
+    mov si, DATA.BUFFER + 8
+    mov di, DATA.BIN_EXT_STR
+    mov cx, 4
+    rep cmpsb
+
+    test cx, cx
+    jnz .error
+
     push es
     mov si, DATA.BUFFER
     mov ax, 0x1900 ; 64 KB after the current segment (0x0900)
@@ -51,7 +60,15 @@ main:
     pop es
     jc .error
 
+    mov si, DATA.BUFFER + 12
+
     call 0x1900:0x0000
+
+    push cs
+    pop ds
+    push cs
+    pop ds
+
     jmp .read_loop
 
 .error:
@@ -75,10 +92,12 @@ main:
 .reset:
     int 19h
 
+
 DATA:
 .PROMPT_STR: db "</> ",0x00
 .NORMAL_COLOR: db 0x0F
 .ERROR_COLOR: db 0x04
+.BIN_EXT_STR: db "BIN",0x00
 .BUFFER: times 127 db 0x00
 .BUFFER.LEN: equ $ - .BUFFER - 1 ; Substract the NULL end byte
 .ERROR_MESSAGE: db "Invalid command or filename provided",0x00
