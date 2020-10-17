@@ -1,0 +1,135 @@
+**Important: If you're experiencing weird behaviour while using a syscall, don't hesitate to open an issue.**
+
+FutureDOS Syscall Reference
+====
+
+You trigger the FutureDOS' library call syscall by using `int 0xFD`.
+
+Available syscalls:
+
+`getchar`  
+`getcharp`  
+`gets`  
+`getsp`  
+`putc`  
+`puts`  
+`fs_load_file`  
+`fs_get_pbp`  
+
+
+`getchar`
+====
+`AH` = 0x01
+
+**Description**  
+Gets a key from the keyboard. Note: it is not printed. If you want it to be printed, see `getcharp`.
+
+**Parameters**  
+Nothing
+
+**Output registers**  
+`AH` = Scancode of the pressed key  
+`AL` = Representation of the pressed key as a letter
+
+`getcharp`
+====
+`AH` = 0x02
+
+**Description**  
+Gets a key from the keyboard. Unlike `getchar`, it is printed.
+
+**Parameters**  
+`BL` = Color of the pressed letter  
+
+**Output registers**
+`AH` = Scancode of the pressed key  
+`AL` = Representation of the pressed key as a letter
+
+`gets`
+====
+`AH` = 0x03
+
+**Description**  
+Gets a string from the keyboard. Note: the string is not printed. If you want it to be printed, see `getsp`.
+
+**Parameters**  
+`ES:DI` = Destination of the string  
+`CX` = Amount of chars to be read
+
+**Output registers**
+Nothing
+
+`getsp`
+====
+`AH` = 0x04
+
+**Description**  
+Gets a string from the keyboard. Unlike `gets`, it is printed.
+
+**Parameters**  
+`ES:DI` = Destination of the string
+`CX` = Amount of chars to be read  
+`BL` = Color of the string
+
+**Output registers**  
+Nothing
+
+`putc`
+====
+`AH` = 0x05
+
+**Description**  
+Prints a char into the screen.
+
+**Parameters**  
+`AL` = Char  
+`BL` = Color
+
+**Output registers**  
+Nothing
+
+`puts`
+====
+`AH` = 0x06
+
+**Description**  
+Prints a string into the screen. The end of the string is a null-byte (0x00).
+
+**Parameters**  
+`DS:SI` = Location of the string  
+`BL` = Color
+
+**Output registers**
+Nothing
+
+`fs_load_file`
+====
+`AH` = 0x07
+
+**Description**  
+Loads a file into memory. Note: you need to allocate a multiple of 512 bytes.
+
+**Parameters**  
+`DS:SI` = Location of the filename. The format must be:
+- 8 bytes name (padded by spaces, if the filename is less than 8 bytes)
+- 3 bytes extension
+- Examples: TEST&nbsp;&nbsp;&nbsp;&nbsp;BIN, FILENAMEBIN
+
+`ES` = Segment where the file will be loaded  
+`BX` = Offset where the file will be loaded
+
+**Output registers**  
+Carry flag set if there was an error (file not found, disk error, other fatal error)
+
+`fs_get_bpb`
+====
+`AH` = 0x08
+
+**Description**  
+Returns you the BIOS Parameter Block.
+
+**Parameters**  
+`ES:DI` = Where the BPB will be returned. You should allocate 59 bytes.
+
+**Output registers**  
+Nothing
