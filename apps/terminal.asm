@@ -40,6 +40,16 @@ main:
     call str_startswith
     jnc .reset
 
+    mov si, DATA.COMMANDS.LS
+    mov cx, DATA.COMMANDS.LS.LEN
+    call str_startswith
+    jnc .ls
+
+    mov si, DATA.COMMANDS.DIR
+    mov cx, DATA.COMMANDS.DIR.LEN
+    call str_startswith
+    jnc .ls
+
     ; Check if the input is a file
     ; Make sure it ends on .BIN
     mov si, DATA.BUFFER + 8
@@ -92,6 +102,69 @@ main:
 .reset:
     int 19h
 
+.ls:
+    mov ah, 0x09
+    mov bx, eof
+    int 0xFD
+    jc .ls.error
+
+    mov si, eof - 32
+    mov di, .ls.BUFFER
+    mov bl, [DATA.NORMAL_COLOR]
+    mov ah, 0x06
+    cld
+
+.ls.parse_root_dir:
+    add si, 32
+    mov al, [si]
+    
+    test al, al
+    jz .read_loop
+
+    cmp al, 0xE5
+    je .ls.parse_root_dir
+
+    push si
+    push di
+
+    mov cx, 13
+    rep movsb
+
+    pop di
+
+    ; Print filename
+    mov si, di
+    int 0xFD
+
+    pop si
+
+    ; Print a new line
+    push ax
+    push bx
+
+    mov ax, (0x05 << 8) | 0x0A
+    mov bl, [DATA.NORMAL_COLOR]
+    int 0xFD
+
+    mov al, 0x0D
+    int 0xFD
+
+    pop bx
+    pop ax
+
+    jmp .ls.parse_root_dir
+
+
+.ls.BUFFER: times 14 db 0
+
+.ls.error:
+    mov ah, 0x06
+    mov bl, [DATA.ERROR_COLOR]
+    mov si, .ls.error.STRING
+    int 0xFD
+    jmp .read_loop
+
+.ls.error.STRING: db "Error while loading disk data"
 
 DATA:
 .PROMPT_STR: db "</> ",0x00
@@ -107,6 +180,10 @@ DATA:
 .COMMANDS.ECHO.LEN: equ $ - .COMMANDS.ECHO
 .COMMANDS.RESET: db "reset"
 .COMMANDS.RESET.LEN: equ $ - .COMMANDS.RESET
+.COMMANDS.LS: db "ls"
+.COMMANDS.LS.LEN: equ $ - .COMMANDS.LS
+.COMMANDS.DIR: db "dir"
+.COMMANDS.DIR.LEN: equ $ - .COMMANDS.DIR
 
 ; Clears the command buffer.
 ; IN/OUT: Nothing
@@ -154,3 +231,5 @@ str_startswith:
     pop cx
     pop ax
     ret
+
+eof:
