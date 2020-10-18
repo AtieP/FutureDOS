@@ -164,7 +164,7 @@ main:
     int 0xFD
     jmp .read_loop
 
-.ls.error.STRING: db "Error while loading disk data"
+.ls.error.STRING: db "Error while loading disk data",0x00
 
 DATA:
 .PROMPT_STR: db "</> ",0x00
