@@ -29,20 +29,10 @@ fs_load_file:
     push cs
     pop es
 
-    mov ax, __FS_BIOS_PARAMETER_BLOCK.rootDirSect
-    call _lba_to_chs
-
-    mov ax, (2 << 8) | 1
     mov bx, keof
-    int 13h
+    call fs_get_root_dir
 
     jc .error
-
-    test ah, ah
-    jnz .error
-
-    cmp al, 1
-    jne .error
 
     ; Check if the file exists
     popf
@@ -197,7 +187,7 @@ fs_load_file:
 .current_fat_sector: dw -1
 
 ; Returns the BPB data.
-; IN: DI = Place to put the BPB data
+; IN: ES:DI = Place to put the BPB data
 ; OUT: Nothing
 fs_get_bpb:
     push cx
@@ -217,6 +207,42 @@ fs_get_bpb:
     pop di
     pop si
     pop cx
+    ret
+
+; Returns the root dir entries.
+; IN: ES = Segment to the destination
+;     BX = Offset to the destination
+; OUT: Carry flag set on error
+fs_get_root_dir:
+    push ax
+    push dx
+
+    mov ax, __FS_BIOS_PARAMETER_BLOCK.rootDirSect
+    call _lba_to_chs
+
+    mov ax, (2 << 8) | 1
+    int 13h
+
+    jc .error
+
+    test ah, ah
+    jnz .error
+
+    cmp al, 1
+    jne .error
+
+    jmp .success
+
+.error:
+    stc
+    jmp .end
+
+.success:
+    clc
+
+.end:
+    pop dx
+    pop ax
     ret
 
 ; IN: AX = Logical sector

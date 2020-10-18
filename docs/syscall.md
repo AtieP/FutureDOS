@@ -133,3 +133,17 @@ Returns you the BIOS Parameter Block.
 
 **Output registers**  
 Nothing
+
+`fs_get_root_dir`
+====
+`AH` = 0x09
+
+**Description**  
+Returns you the root directory.
+
+**Parameters**  
+`ES:DI` = Where the root directory wiill be returned. For now, it's required to you to allocate
+512 bytes.
+
+**Output registers**  
+Carry flag if there was an error (disk error)
