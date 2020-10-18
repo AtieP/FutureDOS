@@ -14,6 +14,7 @@ load_mz:
 	xor bx, bx
 	mov ah, 0x07
 	int 0xFD
+	jc .errRead
 	cmp word [es:bx], 0x5A4D
 	jne .errMagic
 	mov ax, [es:bx + 0x14]
@@ -44,5 +45,12 @@ MZ_JUMP_SG equ ($ + 3)
 	mov bl, 0x04
 	int 0xFD
 	retf
+.errRead:
+	mov ah, 0x06
+	mov si, MSG_READ_FAIL
+	mov bl, 0x04
+	int 0xFD
+	retf
 	
 MSG_INVALID_MAGIC: db "Invalid MZ signature.", 0
+MSG_READ_FAIL: db "Failed to read file.", 0
