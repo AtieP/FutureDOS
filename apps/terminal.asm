@@ -70,7 +70,7 @@ main:
     pop es
     jc .error
 
-    mov si, DATA.BUFFER + 12
+    mov si, DATA.BUFFER
 
     call 0x1900:0x0000
 
