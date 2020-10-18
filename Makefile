@@ -23,7 +23,6 @@ build:
 	sudo cp bin/terminal.bin mnt/terminal.bin
 	sudo cp bin/loadmz.bin mnt/loadmz.bin
 	sudo cp splash.cga mnt/splash.cga
-	sudo cp RAYMARCH.EXE mnt/RAYMARCH.EXE
 	sudo umount disk/futuredos.img
 	rm -rf mnt
 
