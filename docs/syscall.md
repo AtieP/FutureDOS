@@ -178,6 +178,7 @@ Returns the specified file's information. (See https://wiki.osdev.org/FAT12#Dire
 - 8 bytes name (padded by spaces, if the filename is less than 8 bytes)
 - 3 bytes extension
 - Examples: TEST&nbsp;&nbsp;&nbsp;&nbsp;BIN, FILENAMEBIN  
+
 `ES:DI` = 32 bytes for the file info's data.
 
 **Output registers**  
