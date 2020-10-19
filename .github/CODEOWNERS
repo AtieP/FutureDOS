@@ -1,1 +1,7 @@
-* @AtieP
+apps/terminal.asm @AtieP
+apps/loadmz.asm @midn1
+
+docs/* @AtieP
+src/* @AtieP
+
+splash.cga @midn1
