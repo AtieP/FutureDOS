@@ -61,11 +61,6 @@ main:
     jnz .error
 
     push es
-    mov si, DATA.BUFFER
-    mov ah, 0x0A
-    int 0xFD
-    int3
-    jmp $
     mov ax, 0x2000 ; 64 KB after the current segment (0x2000)
     mov es, ax
     xor bx, bx
