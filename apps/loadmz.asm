@@ -2,14 +2,17 @@ org 0
 bits 16
 cpu 8086
 
-EXE_START_SEGMENT equ (0x1900 + (LOADMZ_END - LOADMZ_START + 15) / 16)
+EXE_START_SEGMENT equ ((LOADMZ_END - LOADMZ_START + 15) / 16)
 
 LOADMZ_START:
 
 ; Primitive MZ loader. Does not handle EXE files larger than 64kb.
 load_mz:
+	mov dx, cs
+	
 	add si, 12 ;ds:si at first points to the command buffer. We pass the argument which comes 12 chars later into the 0xFD syscall
 	mov bx, EXE_START_SEGMENT
+	add bx, dx
 	mov es, bx
 	xor bx, bx
 	mov ah, 0x07
@@ -22,11 +25,13 @@ load_mz:
 	mov [cs:MZ_JUMP_IP], ax
 	mov ax, [es:bx + 0x16]
 	add ax, EXE_START_SEGMENT
+	add ax, dx
 	add ax, [es:bx + 0x08]
 	mov [cs:MZ_JUMP_SG], ax
 	mov sp, [es:bx + 0x10]
 	mov ax, [es:bx + 0x0E]
 	add ax, EXE_START_SEGMENT
+	add ax, dx
 	add ax, [es:bx + 0x08]
 	mov ss, ax
 	mov cx, [es:bx + 0x06]
@@ -34,11 +39,13 @@ load_mz:
 .relocationLoop:
 	mov ax, [es:bp + 2]
 	add ax, EXE_START_SEGMENT
+	add ax, dx
 	add ax, [es:bx + 0x08]
 	mov ds, ax
 	mov ax, [es:bx + 0x08]
 	mov si, [es:bp + 0]
 	add word [ds:si], EXE_START_SEGMENT
+	add word [ds:si], dx
 	add word [ds:si], ax
 	add bp, 4
 	loop .relocationLoop
