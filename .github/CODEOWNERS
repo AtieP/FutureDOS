@@ -4,4 +4,6 @@ apps/loadmz.asm @midn1
 docs/ @AtieP
 src/ @AtieP
 
+src/boot/boot.asm @AtieP @StaticSaga
+
 splash.cga @midn1
