@@ -6,7 +6,7 @@ org 0
 %define _KERNEL_OFFSET 0x0000
 
 %define _DEFAULT_FILE_NAME "TERMINALBIN"
-%define _DEFAULT_FILE_SEGMENT 0x0900
+%define _DEFAULT_FILE_SEGMENT 0x1000
 %define _DEFAULT_FILE_OFFSET 0x0000
 
 %macro _PRINT_DONE 0
@@ -159,6 +159,6 @@ init_ivt:
 _DONE_STR: db " DONE",0x0A,0x0D,0x00
 _FAIL_STR: db " FAIL",0x0A,0x0D,0x00
 
-times 3072 - ($ - $$) db 0
+times 4096 - ($ - $$) db 0
 
 keof:
