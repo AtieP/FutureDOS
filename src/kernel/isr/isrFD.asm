@@ -34,6 +34,12 @@ isrFD:
     dec ah
     jz .ah_9
 
+    dec ah
+    jz .ah_0A
+
+    dec ah
+    jz .ah_0B
+
     jmp .error
 
 .ah_1:
@@ -88,6 +94,18 @@ isrFD:
     pop ax
     popf
     call fs_get_root_dir
+    jmp .set_or_clear_carry
+
+.ah_0A:
+    pop ax
+    popf
+    call fs_get_file_size
+    jmp .set_or_clear_carry
+
+.ah_0B:
+    pop ax
+    popf
+    call fs_get_file_info
     jmp .set_or_clear_carry
 
 .error:

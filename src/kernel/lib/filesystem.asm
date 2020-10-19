@@ -267,3 +267,122 @@ _lba_to_chs:
     mov dl, [__FS_BIOS_PARAMETER_BLOCK.driveNo]
     pop ds
     ret
+
+; Returns the file size.
+; IN: DS:SI = Filename
+; OUT: AX = Lower word of file size
+;      DX = Higher word of file size
+;      Carry set on error (file not found, disk error, ...)
+fs_get_file_size:
+    push di
+    push es
+    pushf
+
+    push cs
+    pop es
+
+    mov di, __FS_TEMP_FILE_BUFFER
+    call fs_get_file_info
+    jc .error
+
+    mov ax, [es:di+28]
+    mov dx, [es:di+30]
+
+.error:
+    popf
+    stc
+    jmp .end
+
+.success:
+    popf
+    clc
+    jmp .end
+
+.end:
+    pop es
+    pop di
+    ret
+
+; Returns the file's info.
+; IN: DS:SI = Filename, ES:DI = 32 bytes for saving the file's info
+; OUT: Carry set on error (file not found, disk error, ...)
+; Relevant info: https://wiki.osdev.org/FAT12#Directories
+fs_get_file_info:
+    push ax
+    push bx
+    push cx
+    push di
+    push es
+    pushf
+
+    push cs
+    pop es
+    mov bx, keof
+    call fs_get_root_dir
+    jc .error
+
+    mov di, keof - 32
+    cld
+
+.read_root_dir:
+    add di, 32
+    mov al, [es:di]
+
+    test al, al
+    jz .error
+
+    cmp al, 0xE5
+    je .read_root_dir
+
+    push si
+    push di
+
+    mov cx, 12
+    rep cmpsb
+
+    pop di
+    pop si
+
+    test cx, cx
+    jnz .read_root_dir
+
+    mov si, di
+
+    popf
+    pop es
+    pop di
+    push di
+    push es
+    pushf
+    push ds
+
+    push cs
+    pop ds
+
+    mov cx, 32
+    rep movsb
+
+    pop ds
+
+    jmp .success
+
+.error:
+    popf
+    stc
+    jmp .end
+
+.success:
+    popf
+    clc
+    jmp .end
+
+.end:
+    pop es
+    pop di
+    pop cx
+    pop bx
+    pop ax
+    ret
+
+
+__FS_TEMP_FILE_BUFFER: times 32 db 0

@@ -147,3 +147,38 @@ Returns you the root directory.
 
 **Output registers**  
 Carry flag if there was an error (disk error)
+
+`fs_get_file_size`
+====
+`AH` = 0x0A
+
+**Description**  
+Returns the specified file's size.
+
+**Parameters**  
+`DS:SI` = Location of the filename. The format must be:
+- 8 bytes name (padded by spaces, if the filename is less than 8 bytes)
+- 3 bytes extension
+- Examples: TEST&nbsp;&nbsp;&nbsp;&nbsp;BIN, FILENAMEBIN
+
+**Output registers**  
+`DX` = Upper word of file size  
+`AX` = Lower word of file size  
+Carry flag set on error (file not found, disk error, ...)
+
+`fs_get_file_info`
+====
+`AH` = 0x0B
+
+**Description**  
+Returns the specified file's information. (See https://wiki.osdev.org/FAT12#Directories for more info.)
+
+**Parameters**  
+`DS:SI` = Location of the filename. The format must be:
+- 8 bytes name (padded by spaces, if the filename is less than 8 bytes)
+- 3 bytes extension
+- Examples: TEST&nbsp;&nbsp;&nbsp;&nbsp;BIN, FILENAMEBIN  
+`ES:DI` = 32 bytes for the file info's data.
+
+**Output registers**  
+Carry flag set on error (file not found, disk error, ...)
