@@ -51,8 +51,68 @@ main:
     jnc .ls
 
     ; Check if the input is a file
+    ; Convert a "dot-file" into a "FAT file"
+    ; Example:
+    ; file.bin -> FILE    BIN
+    mov si, DATA.BUFFER
+    mov di, DATA.FILENAME_BUFFER
+    mov cx, -1
+    cld
+
+.to_fat_file:
+    inc cx
+    lodsb
+    cmp cx, 12
+    je .load_file
+    cmp al, "."
+    je .extension
+    cmp al, " " ; Assume it's a bin
+    je .bin
+    test al, al ; Same thing
+    jz .bin
+    ; Convert to uppercase
+    cmp al, "a"
+    jb .already_uppercase
+    cmp al, "z"
+    ja .already_uppercase
+    sub al, 20h
+.already_uppercase:
+    stosb
+    jmp .to_fat_file
+
+.extension:
+    mov bx, 8
+    mov dx, cx
+    mov cx, 8
+    sub bx, dx
+    test bx, bx
+    jz .to_fat_file
+    mov al, " "
+
+.pad_with_spaces:
+    stosb
+    dec bx
+    jz .to_fat_file
+    jmp .pad_with_spaces
+
+.bin:
+    cmp cx, 8
+    je .put_bin_in_buffer
+    mov al, " "
+    stosb
+    inc cx
+    jmp .bin
+
+.put_bin_in_buffer:
+    mov ax, "BI"
+    stosw
+    mov al, "N"
+    stosb
+    jmp .load_file
+
+.load_file:
     ; Make sure it ends on .BIN
-    mov si, DATA.BUFFER + 8
+    mov si, DATA.FILENAME_BUFFER + 8
     mov di, DATA.BIN_EXT_STR
     mov cx, 4
     rep cmpsb
@@ -61,6 +121,7 @@ main:
     jnz .error
 
     push es
+    mov si, DATA.FILENAME_BUFFER
     mov ax, 0x2000 ; 64 KB after the current segment (0x2000)
     mov es, ax
     xor bx, bx
@@ -72,11 +133,10 @@ main:
     mov si, DATA.BUFFER
 
     call 0x2000:0x0000
-
     push cs
     pop ds
     push cs
-    pop ds
+    pop es
 
     jmp .read_loop
 
@@ -172,6 +232,7 @@ DATA:
 .BIN_EXT_STR: db "BIN",0x00
 .BUFFER: times 127 db 0x00
 .BUFFER.LEN: equ $ - .BUFFER - 1 ; Substract the NULL end byte
+.FILENAME_BUFFER: times 13 db 0
 .ERROR_MESSAGE: db "Invalid command or filename provided",0x00
 
 .COMMANDS:
