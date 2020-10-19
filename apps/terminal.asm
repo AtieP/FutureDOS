@@ -62,7 +62,11 @@ main:
 
     push es
     mov si, DATA.BUFFER
-    mov ax, 0x1900 ; 64 KB after the current segment (0x0900)
+    mov ah, 0x0A
+    int 0xFD
+    int3
+    jmp $
+    mov ax, 0x2000 ; 64 KB after the current segment (0x2000)
     mov es, ax
     xor bx, bx
     mov ah, 0x07
@@ -72,7 +76,7 @@ main:
 
     mov si, DATA.BUFFER
 
-    call 0x1900:0x0000
+    call 0x2000:0x0000
 
     push cs
     pop ds
