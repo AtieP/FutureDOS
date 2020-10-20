@@ -29,7 +29,24 @@ org 0
 
 kmain:
 
-    mov ax, _KERNEL_SEGMENT
+    mov ax, cs
+
+    cmp ax, 0x2000
+    jne .executed_as_raw
+
+    push cs
+    pop ds
+
+    mov ah, 0x06
+    mov bl, 0x04
+    mov si, .CANNOT_EXECUTE_USERSPACE_STR
+    int 0xFD
+
+    retf
+
+.CANNOT_EXECUTE_USERSPACE_STR: db "Cannot execute the kernel as a user-space application.",0x00
+
+.executed_as_raw:
     mov ds, ax
     mov es, ax
 
