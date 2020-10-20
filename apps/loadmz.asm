@@ -9,8 +9,20 @@ LOADMZ_START:
 ; Primitive MZ loader. Does not handle EXE files larger than 64kb.
 load_mz:
 	mov dx, cs
+
+	; Go forward until argument (first char after space).
+.loop1:
+	cmp byte [ds:si], ' '
+	je .loop2
+	inc si
+	jmp .loop1
+.loop2:
+	cmp byte [ds:si], ' '
+	jne .loope
+	inc si
+	jmp .loop2
 	
-	add si, 12 ;ds:si at first points to the command buffer. We pass the argument which comes 12 chars later into the 0xFD syscall
+.loope:
 	mov bx, EXE_START_SEGMENT
 	add bx, dx
 	mov es, bx
