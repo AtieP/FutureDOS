@@ -12,7 +12,7 @@ load_mz:
 
 	; Go forward until argument (first char after space).
 .find_arg:
-    lodsb
+	lodsb
 	cmp al, " "
 	je .arg_found
 	test al, al
