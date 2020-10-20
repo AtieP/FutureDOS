@@ -11,18 +11,17 @@ load_mz:
 	mov dx, cs
 
 	; Go forward until argument (first char after space).
-.loop1:
-	cmp byte [ds:si], ' '
-	je .loop2
-	inc si
-	jmp .loop1
-.loop2:
-	cmp byte [ds:si], ' '
-	jne .loope
-	inc si
-	jmp .loop2
-	
-.loope:
+.find_arg:
+    lodsb
+	cmp al, " "
+	je .arg_found
+	test al, al
+	jz .errRead
+	jmp .find_arg
+
+.arg_found:
+    inc si
+
 	mov bx, EXE_START_SEGMENT
 	add bx, dx
 	mov es, bx
