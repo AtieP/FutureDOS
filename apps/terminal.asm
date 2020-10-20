@@ -282,6 +282,15 @@ str_startswith:
     jmp .end
 
 .match:
+    ; Also check if the last char is 0 or " "
+    inc di
+    mov al, [di]
+    cmp al, " "
+    je .success
+    test al, al
+    jne .mismatch
+
+.success:
     popf
     clc
 
