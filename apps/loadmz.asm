@@ -20,8 +20,6 @@ load_mz:
 	jmp .find_arg
 
 .arg_found:
-    inc si
-
 	mov bx, EXE_START_SEGMENT
 	add bx, dx
 	mov es, bx
