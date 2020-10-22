@@ -40,15 +40,15 @@ main:
     call str_startswith
     jnc .reset
 
-    mov si, DATA.COMMANDS.CLEAR
-    mov cx, DATA.COMMANDS.CLEAR.LEN
-    call str_startswith
-    jnc .clear
-
     mov si, DATA.COMMANDS.LS
     mov cx, DATA.COMMANDS.LS.LEN
     call str_startswith
     jnc .ls
+
+    mov si, DATA.COMMANDS.FETCH
+    mov cx, DATA.COMMANDS.FETCH.LEN
+    call str_startswith
+    jnc .sysfetch
 
     mov si, DATA.COMMANDS.DIR
     mov cx, DATA.COMMANDS.DIR.LEN
@@ -166,8 +166,8 @@ main:
 .reset:
     int 19h
 
-.clear:
-    int 19h
+.sysfetch:
+
 
 .ls:
     mov ah, 0x09
@@ -234,7 +234,7 @@ main:
 .ls.error.STRING: db "Error while loading disk data",0x00
 
 DATA:
-.PROMPT_STR: db "</> ",0x00
+.PROMPT_STR: db "C:/> ",0x00
 .NORMAL_COLOR: db 0x0F
 .ERROR_COLOR: db 0x04
 .BIN_EXT_STR: db "BIN",0x00
@@ -248,12 +248,12 @@ DATA:
 .COMMANDS.ECHO.LEN: equ $ - .COMMANDS.ECHO
 .COMMANDS.RESET: db "reset"
 .COMMANDS.RESET.LEN: equ $ - .COMMANDS.RESET
-.COMMANDS.CLEAR: db "clear"
-.COMMANDS.CLEAR.LEN: equ $ - .COMMANDS.CLEAR
 .COMMANDS.LS: db "ls"
 .COMMANDS.LS.LEN: equ $ - .COMMANDS.LS
 .COMMANDS.DIR: db "dir"
 .COMMANDS.DIR.LEN: equ $ - .COMMANDS.DIR
+.COMMANDS.FETCH: db "sysfetch"
+.COMMANDS.FETCH.LEN: equ $ - .COMMANDS.FETCH
 
 ; Clears the command buffer.
 ; IN/OUT: Nothing
