@@ -234,7 +234,7 @@ main:
 .ls.error.STRING: db "Error while loading disk data",0x00
 
 DATA:
-.PROMPT_STR: db "C:/> ",0x00
+.PROMPT_STR: db "</> ",0x00
 .NORMAL_COLOR: db 0x0F
 .ERROR_COLOR: db 0x04
 .BIN_EXT_STR: db "BIN",0x00
