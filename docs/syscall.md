@@ -186,3 +186,17 @@ Returns the specified file's information. (See https://wiki.osdev.org/FAT12#Dire
 
 **Output registers**  
 Carry flag set on error (file not found, disk error, ...)
+
+`fs_filename_to_fat_filename`
+====
+`AH` = 0x0C
+
+**Description**  
+Converts a filename into a valid FAT filename.
+
+**Parameters**
+`DS:SI` = Filename (example: file.bin)  
+`ES:DI` = Destination (11 bytes, padded with spaces) (NULL or a space count as an end marker)
+
+**Output registers**    
+Carry flag set on error (invalid symbol, ...), otherwise clear

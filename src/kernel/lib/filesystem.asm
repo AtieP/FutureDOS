@@ -384,5 +384,135 @@ fs_get_file_info:
     pop ax
     ret
 
+; Converts a filename into a valid FAT filename.
+; IN: DS:SI = Filename, ES:DI = Destination (11 bytes, padded with spaces) (NULL or a space count as an end marker)
+; OUT: Carry flag set on error (invalid char, too long, ...), clear on success
+fs_filename_to_fat_filename:
+    push ax
+    push cx
+    push dx
+    push si
+    push di
+    pushf
 
-__FS_TEMP_FILE_BUFFER: times 32 db 0
+    mov cx, 13
+    xor dl, dl ; Set to 1 when extension is found
+
+.read_loop:
+    dec cx
+    jz .success
+
+    lodsb
+
+    test al, al
+    jz .success
+
+    ; Check for forbidden characters
+    ; Control characters
+    cmp al, 0x1F
+    jbe .error
+
+    cmp al, 0x7F
+    je .error
+
+    ; Other
+    cmp al, '"'
+    je .error
+
+    cmp al, "*"
+    je .error
+
+    cmp al, "+"
+    je .error
+
+    cmp al, ","
+    je .error
+
+    cmp al, "/"
+    je .error
+
+    cmp al, ":"
+    je .error
+
+    cmp al, 0x3B ; ;
+    je .error
+
+    cmp al, "<"
+    je .error
+
+    cmp al, "="
+    je .error
+
+    cmp al, ">"
+    je .error
+
+    cmp al, 0x5C ; Backslash
+    je .error
+
+    cmp al, "["
+    je .error
+
+    cmp al, "]"
+    je .error
+
+    cmp al, "|"
+    je .error
+
+    cmp al, " "
+    je .success
+
+    cmp al, "."
+    je .extension
+
+    cmp al, "a"
+    jb .already_uppercase
+
+    cmp al, "z"
+    ja .already_uppercase
+
+    sub al, 20h
+
+.already_uppercase:
+    stosb
+    jmp .read_loop
+
+.extension:
+    cmp cx, 12
+    je .error
+
+    cmp dl, 1
+    je .error
+
+    mov dl, 1
+    cmp cx, 4
+    je .read_loop
+    jl .error ; Something's wrong, there can't be an extension extension
+
+    mov al, " "
+
+.pad_with_spaces:
+    stosb
+    dec cx
+    cmp cx, 4
+    je .read_loop
+    jmp .pad_with_spaces
+
+.error:
+    popf
+    stc
+    jmp .end
+
+.success:
+    popf
+    clc
+    jmp .end
+
+.end:
+    pop di
+    pop si
+    pop dx
+    pop cx
+    pop ax
+    ret
+
+__FS_TEMP_FILE_BUFFER: times 32 db 0x00

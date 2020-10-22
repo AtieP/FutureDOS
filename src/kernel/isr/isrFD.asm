@@ -40,6 +40,9 @@ isrFD:
     dec ah
     jz .ah_0B
 
+    dec ah
+    jz .ah_0C
+
     jmp .error
 
 .ah_1:
@@ -106,6 +109,12 @@ isrFD:
     pop ax
     popf
     call fs_get_file_info
+    jmp .set_or_clear_carry
+
+.ah_0C:
+    pop ax
+    popf
+    call fs_filename_to_fat_filename
     jmp .set_or_clear_carry
 
 .error:
