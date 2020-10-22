@@ -18,6 +18,7 @@ Available syscalls:
 `fs_get_root_dir`  
 `fs_get_file_size`  
 `fs_get_file_info`  
+`fs_filename_to_filename`
 
 
 `getchar`
@@ -194,9 +195,9 @@ Carry flag set on error (file not found, disk error, ...)
 **Description**  
 Converts a filename into a valid FAT filename.
 
-**Parameters**
-`DS:SI` = Filename (example: file.bin)  
-`ES:DI` = Destination (11 bytes, padded with spaces) (NULL or a space count as an end marker)
+**Parameters**. 
+`DS:SI` = Filename (example: file.bin)  (11 bytes, padded with spaces) (NULL or a space count as an end marker)  
+`ES:DI` = Destination (11 bytes, padded with spaces)
 
 **Output registers**    
 Carry flag set on error (invalid symbol, ...), otherwise clear
