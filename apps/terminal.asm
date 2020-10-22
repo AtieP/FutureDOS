@@ -167,7 +167,7 @@ main:
     int 19h
 
 .sysfetch:
-
+    jmp .read_loop
 
 .ls:
     mov ah, 0x09
