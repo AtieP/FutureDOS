@@ -8,7 +8,7 @@ main:
     pop es
 
 .read_loop:
-    call clear_buffer
+    call clear_buffers
 
     ; Print a new line
     mov ax, (0x05 << 8) | 0x0A
@@ -54,63 +54,14 @@ main:
     ; Convert a "dot-file" into a "FAT file"
     ; Example:
     ; file.bin -> FILE    BIN
-    mov si, DATA.BUFFER
     mov di, DATA.FILENAME_BUFFER
-    mov cx, -1
-    cld
-
-.to_fat_file:
-    inc cx
-    lodsb
-    cmp cx, 12
-    je .load_file
-    cmp al, "."
-    je .extension
-    cmp al, " " ; Assume it's a bin
-    je .bin
-    test al, al ; Same thing
-    jz .bin
-    ; Convert to uppercase
-    cmp al, "a"
-    jb .already_uppercase
-    cmp al, "z"
-    ja .already_uppercase
-    sub al, 20h
-.already_uppercase:
-    stosb
-    jmp .to_fat_file
-
-.extension:
-    mov bx, 8
-    mov dx, cx
-    mov cx, 8
-    sub bx, dx
-    test bx, bx
-    jz .to_fat_file
-    mov al, " "
-
-.pad_with_spaces:
-    stosb
-    dec bx
-    jz .to_fat_file
-    jmp .pad_with_spaces
-
-.bin:
-    cmp cx, 8
-    je .put_bin_in_buffer
-    mov al, " "
-    stosb
-    inc cx
-    jmp .bin
-
-.put_bin_in_buffer:
-    mov ax, "BI"
-    stosw
-    mov al, "N"
-    stosb
-    jmp .load_file
+    mov si, DATA.BUFFER
+    mov ah, 0x0C
+    int 0xFD
+    jc .error
 
 .load_file:
+    cld
     ; Make sure it ends on .BIN
     mov si, DATA.FILENAME_BUFFER + 8
     mov di, DATA.BIN_EXT_STR
@@ -118,7 +69,7 @@ main:
     rep cmpsb
 
     test cx, cx
-    jnz .error
+    jnz .test_executable_without_ext
 
     push es
     mov si, DATA.FILENAME_BUFFER
@@ -128,11 +79,41 @@ main:
     mov ah, 0x07
     int 0xFD
     pop es
-    jc .error
+    jnc .jump_to_app
+    jmp .error
+
+.test_executable_without_ext:
+    ; Add BIN at the end of the filename buffer, perhaps the input is an executable without extension
+    ; First check if the last 3 bytes are empty
+    mov di, DATA.FILENAME_BUFFER + 8
+    mov cx, 4
+    mov al, " "
+    rep scasb
+
+    test cx, cx
+    jnz .error
+
+    ; If they're empty, put BIN at the end
+    mov si, DATA.FILENAME_BUFFER + 8
+    mov [si], word "BI"
+    mov [si+2], byte "N"
+
+    push es
+    mov si, DATA.FILENAME_BUFFER
+    mov ax, 0x2000 ; 64 KB after the current segment (0x2000)
+    mov es, ax
+    xor bx, bx
+    mov ah, 0x07
+    int 0xFD
+    pop es
+    jnc .jump_to_app
+    jmp .error
+
+.jump_to_app:
 
     mov si, DATA.BUFFER
-
     call 0x2000:0x0000
+
     push cs
     pop ds
     push cs
@@ -232,7 +213,7 @@ DATA:
 .BIN_EXT_STR: db "BIN",0x00
 .BUFFER: times 127 db 0x00
 .BUFFER.LEN: equ $ - .BUFFER - 1 ; Substract the NULL end byte
-.FILENAME_BUFFER: times 13 db 0
+.FILENAME_BUFFER: times 11 db " "
 .ERROR_MESSAGE: db "Invalid command or filename provided",0x00
 
 .COMMANDS:
@@ -247,10 +228,14 @@ DATA:
 
 ; Clears the command buffer.
 ; IN/OUT: Nothing
-clear_buffer:
+clear_buffers:
     xor al, al
     mov cx, DATA.BUFFER.LEN
     mov di, DATA.BUFFER
+    rep stosb
+    mov al, " "
+    mov di, DATA.FILENAME_BUFFER
+    mov cx, 11
     rep stosb
     ret
 
