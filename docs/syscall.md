@@ -196,7 +196,7 @@ Carry flag set on error (file not found, disk error, ...)
 Converts a filename into a valid FAT filename.
 
 **Parameters**  
-`DS:SI` = Filename (example: `file.bin`)  (11 bytes, padded with spaces) (NULL or a space count as an end marker)  
+`DS:SI` = Filename (example: `file.bin`) (NULL or a space count as an end marker)  
 `ES:DI` = Destination (11 bytes, padded with spaces)
 
 **Output registers**    
