@@ -40,6 +40,11 @@ main:
     call str_startswith
     jnc .reset
 
+    mov si, DATA.COMMANDS.CLEAR
+    mov cx, DATA.COMMANDS.CLEAR.LEN
+    call str_startswith
+    jnc .clear
+
     mov si, DATA.COMMANDS.LS
     mov cx, DATA.COMMANDS.LS.LEN
     call str_startswith
@@ -161,6 +166,9 @@ main:
 .reset:
     int 19h
 
+.clear:
+    int 19h
+
 .ls:
     mov ah, 0x09
     mov bx, eof
@@ -176,7 +184,7 @@ main:
 .ls.parse_root_dir:
     add si, 32
     mov al, [si]
-    
+
     test al, al
     jz .read_loop
 
@@ -240,6 +248,8 @@ DATA:
 .COMMANDS.ECHO.LEN: equ $ - .COMMANDS.ECHO
 .COMMANDS.RESET: db "reset"
 .COMMANDS.RESET.LEN: equ $ - .COMMANDS.RESET
+.COMMANDS.CLEAR: db "clear"
+.COMMANDS.CLEAR.LEN: equ $ - .COMMANDS.CLEAR
 .COMMANDS.LS: db "ls"
 .COMMANDS.LS.LEN: equ $ - .COMMANDS.LS
 .COMMANDS.DIR: db "dir"
