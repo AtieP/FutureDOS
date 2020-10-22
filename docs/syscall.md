@@ -15,6 +15,9 @@ Available syscalls:
 `puts`  
 `fs_load_file`  
 `fs_get_pbp`  
+`fs_get_root_dir`  
+`fs_get_file_size`  
+`fs_get_file_info`  
 
 
 `getchar`
