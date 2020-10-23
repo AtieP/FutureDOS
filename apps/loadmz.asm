@@ -20,6 +20,18 @@ load_mz:
 	jmp .find_arg
 
 .arg_found:
+	push cs
+	pop es
+
+	mov di, FILENAME_BUFFER
+	mov ah, 0x0C
+	int 0xFD
+	jc .errRead
+
+	push cs
+	pop ds
+
+	mov si, FILENAME_BUFFER
 	mov bx, EXE_START_SEGMENT
 	add bx, dx
 	mov es, bx
@@ -62,16 +74,16 @@ MZ_JUMP_IP equ ($ + 1)
 MZ_JUMP_SG equ ($ + 3)
 	jmp 0:0
 .errMagic:
-    push cs
-    pop ds
+	push cs
+	pop ds
 	mov ah, 0x06
 	mov si, MSG_INVALID_MAGIC
 	mov bl, 0x04
 	int 0xFD
 	retf
 .errRead:
-    push cs
-    pop ds
+	push cs
+	pop ds
 	mov ah, 0x06
 	mov si, MSG_READ_FAIL
 	mov bl, 0x04
@@ -80,5 +92,7 @@ MZ_JUMP_SG equ ($ + 3)
 	
 MSG_INVALID_MAGIC: db "Invalid MZ signature.", 0
 MSG_READ_FAIL: db "Failed to read file.", 0
+
+FILENAME_BUFFER: times 11 db " "
 
 LOADMZ_END:
