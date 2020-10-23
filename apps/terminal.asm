@@ -148,54 +148,156 @@ main:
     int 0xFD
     jc .ls.error
 
-    mov si, eof - 32
-    mov di, .ls.BUFFER
-    mov bl, [DATA.NORMAL_COLOR]
     mov ah, 0x06
+    mov si, .ls.HEADER_STR
+    mov bl, [DATA.NORMAL_COLOR]
+    int 0xFD
+
+    mov ah, 0x05
+
+    mov si, eof - 32
     cld
 
 .ls.parse_root_dir:
     add si, 32
     mov al, [si]
-    
+
     test al, al
-    jz .read_loop
+    jz .ls.end
 
     cmp al, 0xE5
     je .ls.parse_root_dir
 
     push si
-    push di
+    
+    ; Print name
+    mov cx, 8
 
-    mov cx, 13
-    rep movsb
+.ls.print_name:
+    lodsb
+    int 0xFD
+    loop .ls.print_name
 
-    pop di
+    ; Print 3 spaces
+    mov al, " "
+    mov cx, 3
 
-    ; Print filename
-    mov si, di
+.ls.print_spaces_1:
+    int 0xFD
+    loop .ls.print_spaces_1
+
+    ; Print extension
+    mov cx, 3
+
+.ls.print_extension:
+    lodsb
+    int 0xFD
+    loop .ls.print_extension
+
+    ; Print 3 spaces
+    mov al, " "
+    mov cx, 3
+
+.ls.print_spaces_2:
+    int 0xFD
+    loop .ls.print_spaces_2
+
+    ; Print the attribute, depending of the type
+    ; 0x01 = Read only
+    ; 0x02 = Hidden
+    ; 0x04 = System
+    ; 0x08 = Volume ID
+    ; 0x10 = Directory
+    ; 0x20 = Archive
+    lodsb
+
+    cmp al, 0x01
+    je .ls.read_only
+
+    cmp al, 0x02
+    je .ls.hidden
+
+    cmp al, 0x04
+    je .ls.system
+
+    cmp al, 0x08
+    je .ls.volume_id
+
+    cmp al, 0x10
+    je .ls.directory
+
+    cmp al, 0x20
+    je .ls.archive
+
+    ; Print ???
+    mov al, " "
     int 0xFD
 
+    jmp .ls.continue
+
+.ls.read_only:
+    mov al, "R"
+    int 0xFD
+    jmp .ls.continue
+
+.ls.hidden:
+    mov al, "H"
+    int 0xFD
+    mov al, "I"
+    int 0xFD
+    mov al, "D"
+    int 0xFD
+    jmp .ls.continue
+
+.ls.system:
+    mov al, "S"
+    int 0xFD
+    mov al, "Y"
+    int 0xFD
+    mov al, "S"
+    int 0xFD
+    jmp .ls.continue
+
+.ls.volume_id:
+    mov al, "V"
+    int 0xFD
+    mov al, "I"
+    int 0xFD
+    mov al, "D"
+    int 0xFD
+    jmp .ls.continue
+
+.ls.directory:
+    mov al, "D"
+    int 0xFD
+    mov al, "I"
+    int 0xFD
+    mov al, "R"
+    int 0xFD
+    jmp .ls.continue
+
+.ls.archive:
+    mov al, "F"
+    int 0xFD
+    mov al, "I"
+    int 0xFD
+    mov al, "L"
+    int 0xFD
+    jmp .ls.continue
+
+.ls.continue:
     pop si
 
-    ; Print a new line
-    push ax
-    push bx
-
-    mov ax, (0x05 << 8) | 0x0A
-    mov bl, [DATA.NORMAL_COLOR]
+    ; Print new line
+    mov al, 0x0A
     int 0xFD
-
     mov al, 0x0D
     int 0xFD
 
-    pop bx
-    pop ax
-
     jmp .ls.parse_root_dir
 
-
-.ls.BUFFER: times 14 db 0
+.ls.end:
+    jmp .read_loop
 
 .ls.error:
     mov ah, 0x06
@@ -205,6 +307,11 @@ main:
     jmp .read_loop
 
 .ls.error.STRING: db "Error while loading disk data",0x00
+
+.ls.HEADER_STR:
+    db "Name       Ext   Attribute",0x0a,0x0d
+    times 26 db 0xC4
+    db 0x0A,0x0D,0x00
 
 DATA:
 .PROMPT_STR: db "</> ",0x00
