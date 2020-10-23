@@ -29,6 +29,11 @@ main:
     mov cx, DATA.BUFFER.LEN
     int 0xFD
 
+    ; If the first byte is 0 == the user just pressed ENTER
+    mov al, [di]
+    test al, al
+    jz .read_loop
+
     ; Check if the input is internal commands
     mov si, DATA.COMMANDS.ECHO
     mov cx, DATA.COMMANDS.ECHO.LEN
