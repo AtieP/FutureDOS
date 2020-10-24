@@ -207,6 +207,8 @@ main:
     int 0xFD
     loop .ls.print_spaces_2
 
+    sub si, 11
+
     ; Print the attribute, depending of the type
     ; 0x01 = Read only
     ; 0x02 = Hidden
@@ -214,7 +216,7 @@ main:
     ; 0x08 = Volume ID
     ; 0x10 = Directory
     ; 0x20 = Archive
-    lodsb
+    mov al, [si+11]
 
     cmp al, 0x01
     je .ls.read_only
@@ -235,15 +237,17 @@ main:
     je .ls.archive
 
     ; Print ???
-    mov al, " "
+    mov al, "?"
+    int 0xFD
+    int 0xFD
     int 0xFD
 
-    jmp .ls.continue
+    jmp .ls.print_size
 
 .ls.read_only:
     mov al, "R"
     int 0xFD
-    jmp .ls.continue
+    jmp .ls.print_size
 
 .ls.hidden:
     mov al, "H"
@@ -252,7 +256,7 @@ main:
     int 0xFD
     mov al, "D"
     int 0xFD
-    jmp .ls.continue
+    jmp .ls.print_size
 
 .ls.system:
     mov al, "S"
@@ -261,7 +265,7 @@ main:
     int 0xFD
     mov al, "S"
     int 0xFD
-    jmp .ls.continue
+    jmp .ls.print_size
 
 .ls.volume_id:
     mov al, "V"
@@ -270,7 +274,7 @@ main:
     int 0xFD
     mov al, "D"
     int 0xFD
-    jmp .ls.continue
+    jmp .ls.print_size
 
 .ls.directory:
     mov al, "D"
@@ -279,7 +283,7 @@ main:
     int 0xFD
     mov al, "R"
     int 0xFD
-    jmp .ls.continue
+    jmp .ls.print_size
 
 .ls.archive:
     mov al, "F"
@@ -288,7 +292,76 @@ main:
     int 0xFD
     mov al, "L"
     int 0xFD
-    jmp .ls.continue
+
+    ; Print 9 spaces
+    mov cx, 9
+    mov al, " "
+.ls.print_spaces_3:
+    int 0xFD
+    loop .ls.print_spaces_3
+
+.ls.print_size:
+    ; The whole operation:
+    ; 1. ascii_number = (number % 10) + 0x30
+
+    ; First convert to base 10 the lower part
+    mov ax, [si+28]
+    mov cx, 5
+    mov di, .ls.SIZE_BUFFER + 9
+    std
+    push ax
+
+.ls.print_size.loop_lower:
+    pop ax
+    push cx
+
+    xor dx, dx
+    mov cx, 10
+    div cx
+
+    pop cx
+    push ax
+
+    mov al, dl
+    add al, 0x30
+    stosb
+
+    loop .ls.print_size.loop_lower
+    
+    pop dx ; Unused (popping previously pushed ax)
+
+    ; And now the higher part
+    mov ax, [si+30]
+    mov cx, 5
+    push ax
+
+.ls.print_size.loop_higher:
+    pop ax
+    push cx
+
+    xor dx, dx
+    mov cx, 10
+    div cx
+
+    pop cx
+    push ax
+
+    mov al, dl
+    add al, 0x30
+    stosb
+
+    loop .ls.print_size.loop_higher
+
+    pop dx ; Unused (popping previously pushed ax)
+
+    cld
+    push si
+    mov ah, 0x06
+    mov si, .ls.SIZE_BUFFER
+    int 0xFD
+    pop si
+
+    mov ah, 0x05
 
 .ls.continue:
     pop si
@@ -314,9 +387,13 @@ main:
 .ls.error.STRING: db "Error while loading disk data",0x00
 
 .ls.HEADER_STR:
-    db "Name       Ext   Attribute",0x0a,0x0d
-    times 26 db 0xC4
+    db "Name       Ext   Attribute   Size",0x0a,0x0d
+    times 40 db 0xC4
     db 0x0A,0x0D,0x00
+
+.ls.SIZE_BUFFER:
+    times 10 db "0"
+    db "B",0x00
 
 DATA:
 .PROMPT_STR: db "</> ",0x00
