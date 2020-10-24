@@ -218,6 +218,8 @@ main:
     ; 0x20 = Archive
     mov al, [si+11]
 
+    push si
+
     cmp al, 0x01
     je .ls.read_only
 
@@ -236,71 +238,49 @@ main:
     cmp al, 0x20
     je .ls.archive
 
-    ; Print ???
-    mov al, "?"
-    int 0xFD
-    int 0xFD
+    mov ah, 0x06
+    mov si, .ls.UNKNOWN_STRING
     int 0xFD
 
     jmp .ls.print_size
 
 .ls.read_only:
-    mov al, "R"
+    mov ah, 0x06
+    mov si, .ls.READ_ONLY_STRING
     int 0xFD
     jmp .ls.print_size
 
 .ls.hidden:
-    mov al, "H"
-    int 0xFD
-    mov al, "I"
-    int 0xFD
-    mov al, "D"
+    mov ah, 0x06
+    mov si, .ls.HIDDEN_STRING
     int 0xFD
     jmp .ls.print_size
 
 .ls.system:
-    mov al, "S"
-    int 0xFD
-    mov al, "Y"
-    int 0xFD
-    mov al, "S"
+    mov ah, 0x06
+    mov si, .ls.SYSTEM_STRING
     int 0xFD
     jmp .ls.print_size
 
 .ls.volume_id:
-    mov al, "V"
-    int 0xFD
-    mov al, "I"
-    int 0xFD
-    mov al, "D"
+    mov ah, 0x06
+    mov si, .ls.VOLUME_ID_STRING
     int 0xFD
     jmp .ls.print_size
 
 .ls.directory:
-    mov al, "D"
-    int 0xFD
-    mov al, "I"
-    int 0xFD
-    mov al, "R"
+    mov ah, 0x06
+    mov si, .ls.DIRECTORY_STRING
     int 0xFD
     jmp .ls.print_size
 
 .ls.archive:
-    mov al, "F"
+    mov ah, 0x06
+    mov si, .ls.ARCHIVE_STRING
     int 0xFD
-    mov al, "I"
-    int 0xFD
-    mov al, "L"
-    int 0xFD
-
-    ; Print 9 spaces
-    mov cx, 9
-    mov al, " "
-.ls.print_spaces_3:
-    int 0xFD
-    loop .ls.print_spaces_3
 
 .ls.print_size:
+    pop si
     ; The whole operation:
     ; 1. ascii_number = (number % 10) + 0x30
 
@@ -394,6 +374,14 @@ main:
 .ls.SIZE_BUFFER:
     times 10 db "0"
     db "B",0x00
+
+.ls.READ_ONLY_STRING: db "Read-only   ",0x00
+.ls.HIDDEN_STRING: db "Hidden      ",0x00
+.ls.SYSTEM_STRING: db "System      ",0x00
+.ls.VOLUME_ID_STRING: db "Volume ID   ",0x00
+.ls.DIRECTORY_STRING: db "Directory   ",0x00
+.ls.ARCHIVE_STRING: db "Archive     ",0x00
+.ls.UNKNOWN_STRING: db "Unknown     ",0x00
 
 DATA:
 .PROMPT_STR: db "</> ",0x00
