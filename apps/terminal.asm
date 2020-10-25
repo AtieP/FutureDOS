@@ -148,10 +148,27 @@ main:
     int 19h
 
 .ls:
+    ; LS has an optional parameter, which is `--all`.
+    ; It shows all files in disk, even if they're hidden, volume ID or system.
+    add di, DATA.COMMANDS.LS.LEN
+    inc di
+    mov si, .ls.ALL_PARAMETER_STR
+    mov cx, .ls.ALL_PARAMETER_STR.LEN
+    call str_startswith
+    jnc .ls.all_parameter
+
+    mov [.ls.ALL_PARAMETER], byte 0x00
+
+    jmp .ls.print_header
+
+.ls.all_parameter:
+    mov [.ls.ALL_PARAMETER], byte 0x01
+
+.ls.print_header:
     mov ah, 0x09
     mov bx, eof
     int 0xFD
-    jc .ls.error
+    jc .ls.disk_error
 
     mov ah, 0x06
     mov si, .ls.HEADER_STR
@@ -173,8 +190,27 @@ main:
     cmp al, 0xE5
     je .ls.parse_root_dir
 
+    mov [si+11], byte 0x02
+
+    ; Check what's the attribute
+    cmp [si+11], byte 0x02 ; Hidden
+    je .ls.parse_root_dir.check_all_parameter
+
+    cmp [si+11], byte 0x04 ; System
+    je .ls.parse_root_dir.check_all_parameter
+
+    cmp [si+11], byte 0x08 ; Volume ID
+    je .ls.parse_root_dir.check_all_parameter
+
+    jmp .ls.parse_root_dir.end
+
+.ls.parse_root_dir.check_all_parameter:
+    cmp [.ls.ALL_PARAMETER], byte 0x00
+    je .ls.parse_root_dir
+
+.ls.parse_root_dir.end:
     push si
-    
+
     ; Print name
     mov cx, 8
 
@@ -357,7 +393,7 @@ main:
 .ls.end:
     jmp .read_loop
 
-.ls.error:
+.ls.disk_error:
     mov ah, 0x06
     mov bl, [DATA.ERROR_COLOR]
     mov si, .ls.error.STRING
@@ -374,6 +410,13 @@ main:
 .ls.SIZE_BUFFER:
     times 10 db "0"
     db "B",0x00
+
+; Boolean which specifies if the `--all` parameter was passed
+.ls.ALL_PARAMETER: db 0
+
+; The string
+.ls.ALL_PARAMETER_STR: db "--all"
+.ls.ALL_PARAMETER_STR.LEN: equ $ - .ls.ALL_PARAMETER_STR
 
 .ls.READ_ONLY_STRING: db "Read-only   ",0x00
 .ls.HIDDEN_STRING: db "Hidden      ",0x00
