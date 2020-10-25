@@ -7,7 +7,7 @@ cpu 8086
 ; IN: SI = Pointer to filename (8 bytes name, 3 bytes extension)
 ;     ES = Segment to load the file to
 ;     BX = Segment to load the file to
-; OUT: Carry set if there was an error loading the file (file not found, disk error...)
+; OUT: Carry set if there was an error loading the file (file not found, disk error, it's a directory, it's a volume ID, ...)
 fs_load_file:
     push ax
     push bx
@@ -66,6 +66,15 @@ fs_load_file:
 
     test cx, cx
     jnz .check_if_file_exists
+
+    ; Check attributes
+    mov al, [es:di+11]
+
+    cmp al, 0x08 ; Volume ID
+    je .error
+
+    cmp al, 0x10 ; Directory
+    je .error
 
     mov ax, [es:di+26]
 

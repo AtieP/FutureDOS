@@ -123,7 +123,7 @@ Loads a file into memory. Note: you need to allocate a multiple of 512 bytes.
 `BX` = Offset where the file will be loaded
 
 **Output registers**  
-Carry flag set if there was an error (file not found, disk error, other fatal error)
+Carry flag set if there was an error (file not found, disk error, it's a directory, it's a Volume ID, ...)
 
 `fs_get_bpb`
 ====
