@@ -190,8 +190,6 @@ main:
     cmp al, 0xE5
     je .ls.parse_root_dir
 
-    mov [si+11], byte 0x02
-
     ; Check what's the attribute
     cmp [si+11], byte 0x02 ; Hidden
     je .ls.parse_root_dir.check_all_parameter
