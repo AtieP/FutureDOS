@@ -40,6 +40,26 @@ main:
     call str_startswith
     jnc .echo
 
+    mov si, DATA.COMMANDS.POWEROFF
+    mov cx, DATA.COMMANDS.POWEROFF.LEN
+    call str_startswith
+    jnc .shutdown
+    
+    mov si, DATA.COMMANDS.POWEROFF
+    mov cx, DATA.COMMANDS.POWEROFF.LEN
+    call str_startswith
+    jnc .shutdown
+
+    mov si, DATA.COMMANDS.EXIT
+    mov cx, DATA.COMMANDS.EXIT.LEN
+    call str_startswith
+    jnc .shutdown
+
+    mov si, DATA.COMMANDS.SHUTDOWN
+    mov cx, DATA.COMMANDS.SHUTDOWN.LEN
+    call str_startswith
+    jnc .shutdown
+
     mov si, DATA.COMMANDS.RESET
     mov cx, DATA.COMMANDS.RESET.LEN
     call str_startswith
@@ -156,6 +176,17 @@ main:
 
 .reset:
     int 19h
+
+.shutdown:
+    mov ax, 0x1000
+    mov ax, ss
+    mov sp, 0xf000
+    mov ax, 0x5307
+    mov bx, 0x0001
+    mov cx, 0x0003
+    int 0x15
+
+    ret  ;if interrupt doesnt work
 
 .ls:
     ; LS has an optional parameter, which is `--all`.
@@ -457,6 +488,12 @@ DATA:
 .COMMANDS.LS.LEN: equ $ - .COMMANDS.LS
 .COMMANDS.DIR: db "dir"
 .COMMANDS.DIR.LEN: equ $ - .COMMANDS.DIR
+.COMMANDS.POWEROFF: db "poweroff"
+.COMMANDS.POWEROFF.LEN: equ $ - .COMMANDS.POWEROFF
+.COMMANDS.SHUTDOWN: db "shutdown"
+.COMMANDS.SHUTDOWN.LEN: equ $ - .COMMANDS.SHUTDOWN
+.COMMANDS.EXIT: db "exit"
+.COMMANDS.EXIT.LEN: equ $ - .COMMANDS.EXIT
 
 ; Clears the command buffer.
 ; IN/OUT: Nothing

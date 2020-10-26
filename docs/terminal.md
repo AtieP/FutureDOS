@@ -28,3 +28,6 @@ Shows all files of the current directory. Parameters (all of them are optional):
 
 **`reboot` (or `reset` or `restart`)**  
 Boots from the next default drive.
+
+**`poweroff` (or `shutdown` or `exit`)**
+Shutdowns computer using BIOS.
