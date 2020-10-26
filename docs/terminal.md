@@ -26,5 +26,5 @@ Prints the string right passed after it. Example usage: `echo Hello, World!`
 Shows all files of the current directory. Parameters (all of them are optional):  
   - `--all`: Shows all files in the current directory, doesn't matter if they're hidden, they're system files, or they're volume IDs.
 
-**`reset`**  
+**`reboot` (or `restart`)**  
 Boots from the next default drive.
