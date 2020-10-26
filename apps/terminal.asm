@@ -44,6 +44,11 @@ main:
     mov cx, DATA.COMMANDS.RESET.LEN
     call str_startswith
     jnc .reset
+    
+    mov si, DATA.COMMANDS.RESTART
+    mov cx, DATA.COMMANDS.RESTART.LEN
+    call str_startswith
+    jnc .reset
 
     mov si, DATA.COMMANDS.REBOOT
     mov cx, DATA.COMMANDS.REBOOT.LEN
@@ -443,6 +448,8 @@ DATA:
 .COMMANDS.ECHO: db "echo"
 .COMMANDS.ECHO.LEN: equ $ - .COMMANDS.ECHO
 .COMMANDS.RESET: db "restart"
+.COMMANDS.RESTART.LEN: equ $ - .COMMANDS.RESTART
+.COMMANDS.RESTART: db "reset"
 .COMMANDS.RESET.LEN: equ $ - .COMMANDS.RESET
 .COMMANDS.REBOOT: db "reboot"
 .COMMANDS.REBOOT.LEN: equ $ - .COMMANDS.REBOOT
