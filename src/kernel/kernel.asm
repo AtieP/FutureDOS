@@ -58,6 +58,7 @@ kmain:
 
     _PRINT_TRACE .INITIALIZING_DRIVERS_STR
     call init_fs
+    call init_pic
     _PRINT_DONE
 
     ; Load splash screen
@@ -160,6 +161,7 @@ init_ivt:
 %include "kernel/drivers/cga.asm"
 %include "kernel/drivers/filesystem.asm"
 %include "kernel/drivers/keyboard.asm"
+%include "kernel/drivers/pic.asm"
 
 %include "kernel/lib/debug.asm"
 %include "kernel/lib/filesystem.asm"
