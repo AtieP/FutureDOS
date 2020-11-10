@@ -296,6 +296,7 @@ fs_get_file_size:
 
     mov ax, [es:di+28]
     mov dx, [es:di+30]
+    jmp .success
 
 .error:
     popf
