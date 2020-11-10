@@ -55,6 +55,11 @@ main:
     call str_startswith
     jnc .ls
 
+    mov si, DATA.COMMANDS.DISPLAY
+    mov cx, DATA.COMMANDS.DISPLAY.LEN
+    call str_startswith
+    jnc .display
+
     ; Check if the input is a file
     ; Convert a "dot-file" into a "FAT file"
     ; Example:
@@ -424,6 +429,63 @@ main:
 .ls.ARCHIVE_STRING: db "Archive     ",0x00
 .ls.UNKNOWN_STRING: db "Unknown     ",0x00
 
+.display:
+    mov si, di
+    add si, DATA.COMMANDS.DISPLAY.LEN
+    inc si
+    mov al, [si]
+
+    test al, al
+    jz .display.argument_expected
+
+    ; First convert to a valid FAT Filename
+    mov ah, 0x0C
+    mov di, DATA.FILENAME_BUFFER
+    int 0xFD
+    jc .display.file_error
+
+    mov si, di
+    mov ah, 0x07
+    mov bx, eof
+    int 0xFD
+    jc .display.file_error
+
+    ; And get the size
+    mov ah, 0x0A
+    int 0xFD
+    jc .display.file_error
+
+    mov cx, ax
+    mov si, eof
+    mov ah, 0x05
+    mov bl, [DATA.NORMAL_COLOR]
+
+.display.first_loop:
+    lodsb
+    int 0xFD
+    loop .display.first_loop
+
+    ; ... Anyways can't load anything bigger than 64k
+    jmp .read_loop
+
+.display.argument_expected:
+    mov si, .display.argument_expected.STRING
+    mov ah, 0x06
+    mov bl, [DATA.ERROR_COLOR]
+    int 0xFD
+    jmp .read_loop
+
+.display.argument_expected.STRING: db "Argument expected",0x00
+
+.display.file_error:
+    mov si, .display.file_error.STRING
+    mov ah, 0x06
+    mov bl, [DATA.ERROR_COLOR]
+    int 0xFD
+    jmp .read_loop
+
+.display.file_error.STRING: db "File not found, disk error, or invalid filename",0x00
+
 DATA:
 .PROMPT_STR: db "</> ",0x00
 .NORMAL_COLOR: db 0x0F
@@ -443,6 +505,8 @@ DATA:
 .COMMANDS.LS.LEN: equ $ - .COMMANDS.LS
 .COMMANDS.DIR: db "dir"
 .COMMANDS.DIR.LEN: equ $ - .COMMANDS.DIR
+.COMMANDS.DISPLAY: db "display"
+.COMMANDS.DISPLAY.LEN: equ $ - .COMMANDS.DISPLAY
 
 ; Clears the command buffer.
 ; IN/OUT: Nothing

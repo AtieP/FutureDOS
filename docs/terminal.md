@@ -28,3 +28,7 @@ Shows all files of the current directory. Parameters (all of them are optional):
 
 **`reset`**  
 Boots from the next default drive.
+
+**`display`**  
+Displays a file's contents. Parameters:  
+  - `filename` (mandatory): the file to display. Example: `display kernel.bin`.
