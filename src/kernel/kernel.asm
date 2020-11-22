@@ -13,9 +13,11 @@ kmain:
     push cs
     pop ds
 
+.video_init:
     mov bl, 0x07
     call cga_init
 
+.pic_init:
     mov si, pic_init_str
     call kputs
 
@@ -24,6 +26,7 @@ kmain:
     mov si, done_str
     call kputs
 
+.ps2_init:
     mov si, ps2_init_str
     call kputs
 
@@ -35,12 +38,20 @@ kmain:
     cmp ax, 2
     je .ps2_no_mouse
 
-    push cs
-    pop ds
+    mov si, done_str
+    call kputs
+
+.keyb_init:
+    mov si, ps2keybxt_init_str
+    call kputs
+
+    call ps2keybxt_init
+
+    cmp ax, 1
+    je .ps2_error
 
     mov si, done_str
     call kputs
-    Hang
 
 .ps2_error:
     ; Just restart
@@ -52,7 +63,7 @@ kmain:
     mov si, ps2_init_str.no_mouse
     call kputs
 
-    Hang
+    jmp .keyb_init
 
 kputs:
     push bx
@@ -74,10 +85,12 @@ kputs:
 pic_init_str: db "Initializing the Programmable Interrupt Controller...",0x00
 ps2_init_str: db "Initializing the PS/2 Controller...",0x00
 ps2_init_str.no_mouse: db "Done!",0x0A,0x0D,"Warning: no mouse available",0x00
+ps2keybxt_init_str: db "Initializing the PC/XT Keyboard... ",0x00
 done_str: db " Done!",0x0A,0x0D,0x00
 
 %include "src/kernel/devices/cga.asm"
 %include "src/kernel/devices/ps2.asm"
+%include "src/kernel/devices/ps2keybxt.asm"
 %include "src/kernel/sys/pic.asm"
 
 times 4096 - ($ - $$) db 0x00
