@@ -53,6 +53,8 @@ kmain:
     mov si, done_str
     call kputs
 
+    Hang
+
 .ps2_error:
     ; Just restart
     mov al, 0xFE
