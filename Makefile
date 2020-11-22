@@ -1,15 +1,26 @@
-build:
-	mkdir -p bin
-	nasm -f bin src/boot/boot.asm -o bin/boot.bin
-	nasm -f bin src/kernel/kernel.asm -o bin/kernel.bin
-	
-	dd if=/dev/zero of=futuredos.img bs=1024 count=1440
-	mkfs.msdos futuredos.img
-	dd if=bin/boot.bin of=futuredos.img bs=512 count=1 conv=notrunc
-	mkdir -p mnt
-	sudo mount -o loop -t msdos futuredos.img mnt
-	sudo cp bin/kernel.bin mnt
-	sudo umount futuredos.img
+AS = nasm
+AS_FLAGS = -f bin -o
 
-run:
-	qemu-system-i386 futuredos.img
+futuredos.img: clean boot.bin kernel.bin
+	dd if=/dev/zero of=$@ bs=1024 count=1440
+	mkfs.msdos $@
+	dd if=boot.bin of=$@ count=512 conv=notrunc
+	mkdir mnt
+	sudo mount -o loop -t msdos futuredos.img mnt
+	sudo cp kernel.bin mnt/kernel.bin
+	sudo umount mnt
+	qemu-system-i386 $@
+
+boot.bin:
+	$(AS) $(AS_FLAGS) boot.bin src/boot/boot.asm
+
+kernel.bin:
+	$(AS) $(AS_FLAGS) kernel.bin src/kernel/kernel.asm
+
+%.bin: %.asm
+	$(AS) $(AS_FLAGS) $< $@
+
+clean:
+	rm *.bin
+	rm *.img
+	rm -rf mnt || true
