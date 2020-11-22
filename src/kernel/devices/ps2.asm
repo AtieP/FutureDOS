@@ -144,7 +144,7 @@ ps2_init:
 
     mov al, [.second_ps2_port_available]
     cmp al, 0x02
-    je .enable_devices ; No mouse
+    je .success ; No mouse
 
 .test_devices.mouse:
     call ps2_wait_write
@@ -160,20 +160,9 @@ ps2_init:
     test al, al
     jnz .error
 
-    ; Enable mouse
-    call ps2_wait_write
-    mov al, 0xA8
-    out 0x64, al
-
-.enable_devices:
-    ; The mouse is already enabled, if it existed
-    call ps2_wait_write
-    mov al, 0xAE
-    out 0x64, al
-
-    ; Now, it's up for the PS/2 keyboard and PS/2 mouse
-    ; device drivers to reset themselves
 .success:
+    ; Now, it's up for the PS/2 keyboard and PS/2 mouse
+    ; device drivers to reset and enable themselves
     xor ah, ah
     mov al, [.second_ps2_port_available]
     popf
