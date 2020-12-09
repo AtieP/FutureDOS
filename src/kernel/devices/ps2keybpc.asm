@@ -1,7 +1,7 @@
 db "FV"
 dw 0x0000
-dw ps2keybxt_irq
-dw ps2keybxt_init
+dw ps2keybpc_irq
+dw ps2keybpc_init
 
 ; -----------------------------------------------------
 ; TODO: When filesystem driver is implemented, create
@@ -9,8 +9,8 @@ dw ps2keybxt_init
 ; -----------------------------------------------------
 
 ; Key buffers
-ps2keybxt_keyboard_buffer_ascii: db 0x00
-ps2keybxt_keyboard_buffer_scancode: db 0x00
+ps2keybpc_keyboard_buffer_ascii: db 0x00
+ps2keybpc_keyboard_buffer_scancode: db 0x00
 
 ; Bit 0 set = Capslock
 ; Bit 1 set = Left shift
@@ -19,7 +19,7 @@ ps2keybxt_keyboard_buffer_scancode: db 0x00
 ; Bit 4 set = Alt
 ; Bit 5 set = IRQ called
 ; All other bits undefined
-ps2keybxt_keyboard_flags: db 0x00
+ps2keybpc_keyboard_flags: db 0x00
 
 ; Initializes the PS/2 PC/XT keyboard.
 ; IN:
@@ -27,7 +27,7 @@ ps2keybxt_keyboard_flags: db 0x00
 ; OUT:
 ;    AX = 0x00 (Success)
 ;    AX = 0x01 (Error)
-ps2keybxt_init:
+ps2keybpc_init:
     push cx
     pushf
 
@@ -121,7 +121,7 @@ ps2keybxt_init:
     mov ax, 1
     ret
 
-ps2keybxt_irq:
+ps2keybpc_irq:
     push ax
     push bx
     push si
@@ -132,10 +132,10 @@ ps2keybxt_irq:
 
     in al, 0x60
 
-    mov [ps2keybxt_keyboard_buffer_scancode], al
-    mov bl, [ps2keybxt_keyboard_flags]
+    mov [ps2keybpc_keyboard_buffer_scancode], al
+    mov bl, [ps2keybpc_keyboard_flags]
 
-    mov [ps2keybxt_keyboard_buffer_ascii], byte 0xFF
+    mov [ps2keybpc_keyboard_buffer_ascii], byte 0xFF
 
 .ascii.check_modifiers:
     xor ah, ah
@@ -187,10 +187,10 @@ ps2keybxt_irq:
     test bl, 1 << 4
     jnz .ascii.convert_to_ascii.alt
 
-    mov si, ps2keybxt_layout
+    mov si, ps2keybpc_layout
     add si, ax
     mov al, [si]
-    mov [ps2keybxt_keyboard_buffer_ascii], al
+    mov [ps2keybpc_keyboard_buffer_ascii], al
     jmp .ascii.apply_modifiers
 
 .ascii.convert_to_ascii.capslock:
@@ -200,29 +200,29 @@ ps2keybxt_irq:
     test bl, 1 << 2
     jnz .ascii.convert_to_ascii.capslock.shift
 
-    mov si, ps2keybxt_layout.capslock
+    mov si, ps2keybpc_layout.capslock
     add si, ax
     mov al, [si]
-    mov [ps2keybxt_keyboard_buffer_ascii], al
+    mov [ps2keybpc_keyboard_buffer_ascii], al
     jmp .ascii.apply_modifiers
 
 .ascii.convert_to_ascii.capslock.shift:
-    mov si, ps2keybxt_layout.shift_and_capslock
+    mov si, ps2keybpc_layout.shift_and_capslock
     add si, ax
     mov al, [si]
-    mov [ps2keybxt_keyboard_buffer_ascii], al
+    mov [ps2keybpc_keyboard_buffer_ascii], al
     jmp .ascii.apply_modifiers
 
 .ascii.convert_to_ascii.shift:
-    mov si, ps2keybxt_layout.shift
+    mov si, ps2keybpc_layout.shift
     add si, ax
     mov al, [si]
-    mov [ps2keybxt_keyboard_buffer_ascii], al
+    mov [ps2keybpc_keyboard_buffer_ascii], al
     jmp .ascii.apply_modifiers
 
 .ascii.convert_to_ascii.control:
 .ascii.convert_to_ascii.alt:
-    mov [ps2keybxt_keyboard_buffer_ascii], byte 0xFF
+    mov [ps2keybpc_keyboard_buffer_ascii], byte 0xFF
     jmp .ascii.apply_modifiers
 
 .ascii.alt.pressed:
@@ -270,7 +270,7 @@ ps2keybxt_irq:
 .ascii.apply_modifiers:
     ; Also set IRQ called
     or bl, 1 << 5
-    mov [ps2keybxt_keyboard_flags], bl
+    mov [ps2keybpc_keyboard_flags], bl
 
 .end:
     mov al, 0x20
@@ -283,7 +283,7 @@ ps2keybxt_irq:
     iret
 
 ; en-us layout
-ps2keybxt_layout:
+ps2keybpc_layout:
 .normal:
     ; Pressed
 	db 0xFF

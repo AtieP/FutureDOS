@@ -42,10 +42,10 @@ kmain:
     call kputs
 
 .keyb_init:
-    mov si, ps2keybxt_init_str
+    mov si, ps2keybpc_init_str
     call kputs
 
-    call ps2keybxt_init
+    call ps2keybpc_init
 
     cmp ax, 1
     je .ps2_error
@@ -87,12 +87,12 @@ kputs:
 pic_init_str: db "Initializing the Programmable Interrupt Controller...",0x00
 ps2_init_str: db "Initializing the PS/2 Controller...",0x00
 ps2_init_str.no_mouse: db "Done!",0x0A,0x0D,"Warning: no mouse available",0x00
-ps2keybxt_init_str: db "Initializing the PC/XT Keyboard... ",0x00
+ps2keybpc_init_str: db "Initializing the PC Keyboard... ",0x00
 done_str: db " Done!",0x0A,0x0D,0x00
 
 %include "src/kernel/devices/cga.asm"
 %include "src/kernel/devices/ps2.asm"
-%include "src/kernel/devices/ps2keybxt.asm"
+%include "src/kernel/devices/ps2keybpc.asm"
 %include "src/kernel/sys/pic.asm"
 
 times 4096 - ($ - $$) db 0x00
