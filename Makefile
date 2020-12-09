@@ -21,6 +21,6 @@ kernel.bin:
 	$(AS) $(AS_FLAGS) $< $@
 
 clean:
-	rm *.bin
-	rm *.img
-	rm -rf mnt || true
+	-rm *.bin
+	-rm *.img
+	-rm -rf mnt || true
